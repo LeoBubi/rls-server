@@ -115,6 +115,13 @@ int rls_server_initialize(int argc, char const **argv);
 void rls_listener(void);
 
 
+/**
+ * @brief rls handler process.
+ * @param client_socket Client socket file descriptor.
+*/
+void rls_handler(int client_socket);
+
+
 
 
 
