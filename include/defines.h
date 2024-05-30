@@ -4,8 +4,14 @@
 #include <includes.h>
 
 
-#define PORTMIN  1      // minimum server port number
-#define PORTMAX  65535  // maximum server port number
+#define CONFIG_FILE "/etc/rls-server/rls-server.conf"
+
+
+#define PORTMIN 1       // minimum server port number
+#define PORTMAX 65535   // maximum server port number
+#define MINCONN 1       // minimum maximum number of connections
+#define MAXCONN 64      // maximum maximum number of connections
+#define CONNLEN 2       // number of digits in maximum number of connections
 
 #define CLINMAX 128 // maximum line length in configuration file
 
@@ -62,6 +68,16 @@ char* userinput(char* prompt);
  * @return 1 if all checks are passed, 0 otherwise.
 */
 int rls_server_checks(void);
+
+
+/**
+ * @brief rls server setup.
+ * @param argc Command line argument count.
+ * @param argv Command line arguments.
+ * @return 1 if successful, 0 otherwise.
+*/
+int rls_server_initialize(int argc, char const **argv);
+
 
 
 
