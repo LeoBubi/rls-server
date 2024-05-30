@@ -23,6 +23,7 @@
 
 #define sig_t char  // signal type
 #define ctl_t char  // control type
+#define ack_t char  // ACK type
 
 #define CTLQUIT 0  // quit command code
 
@@ -71,7 +72,7 @@ char* userinput(char* prompt);
  * @param code ACK code.
  * @return 1 if successful, 0 otherwise.
 */
-int sndack(int sockfd, char code);
+int sndack(int sockfd, ack_t ack);
 
 
 /**

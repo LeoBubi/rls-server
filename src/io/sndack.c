@@ -2,9 +2,9 @@
 
 
 int
-sndack(int sockfd, char code)
+sndack(int sockfd, ack_t ack)
 {
-    if (write(sockfd, &code, sizeof(code)) != 1) {
+    if (write(sockfd, &ack, sizeof(ack)) != 1) {
 #ifdef __DEBUG
         perror("sndack: write");
 #endif
