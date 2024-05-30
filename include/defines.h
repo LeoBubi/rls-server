@@ -57,5 +57,13 @@ char* userinput(char* prompt);
 
 
 
+/**
+ * @brief rls server initial checks.
+ * @return 1 if all checks are passed, 0 otherwise.
+*/
+int rls_server_checks(void);
+
+
+
 
 #endif /* _DEFINES_H */
