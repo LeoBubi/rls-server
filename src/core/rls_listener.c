@@ -81,6 +81,11 @@ rls_listener(void)
     while (1)
     {
         client_socket = accept(server_socket, NULL, NULL);
+#ifdef __DEBUG
+        if (client_socket == -1) {
+            perror("rls_listener: accept");
+        }
+#endif
         
         if (client_socket > 0)
         {
