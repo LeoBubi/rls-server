@@ -47,5 +47,15 @@ int isint(const char *s);
 int config_get(char *key, char *value, size_t n);
 
 
+/**
+ * @brief Get user input.
+ * @param prompt Prompt message or NULL.
+ * @return User input string w/o newline character.
+ * @note Returned string must be freed by the caller.
+*/
+char* userinput(char* prompt);
+
+
+
 
 #endif /* _DEFINES_H */

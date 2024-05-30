@@ -2,6 +2,9 @@
 #define _INCLUDES_H
 
 
+#define _GNU_SOURCE 1
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +13,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <linux/limits.h>
+#include <signal.h>
 
 #include "defines.h"
 
