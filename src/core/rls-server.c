@@ -58,7 +58,7 @@ main(int argc, char const *argv[])
     }
 
     if (listener_pid == 0)
-        rls_listener();
+        rls_listener(); // never returns
 
     /* ----- set signal handlers ----- */
 
