@@ -21,6 +21,9 @@
 #define SIGMSG 1  // signal message type code
 #define CTLMSG 2  // control message type code
 
+#define sig_t char  // signal type
+#define ctl_t char  // control type
+
 #define CTLQUIT 0  // quit command code
 
 
@@ -62,6 +65,33 @@ int config_get(char *key, char *value, size_t n);
 char* userinput(char* prompt);
 
 
+/**
+ * @brief Send an ACK to a client.
+ * @param fd Client socket file descriptor.
+ * @param code ACK code.
+ * @return 1 if successful, 0 otherwise.
+*/
+int sndack(int sockfd, char code);
+
+
+/**
+ * @brief Send a message to a client.
+ * @param fd Client socket file descriptor.
+ * @param msg Message to send.
+ * @return 1 if successful, 0 otherwise.
+*/
+int sndmsg(int sockfd, const char *msg);
+
+
+/**
+ * @brief Get a message from a client.
+ * @param fd Client socket file descriptor.
+ * @param type Message type buffer.
+ * @return Message string if successful, NULL otherwise.
+ * @note Returned string must be freed by the caller.
+*/
+char* getmsg(int sockfd, char* type);
+
 
 /**
  * @brief rls server initial checks.
@@ -77,6 +107,12 @@ int rls_server_checks(void);
  * @return 1 if successful, 0 otherwise.
 */
 int rls_server_initialize(int argc, char const **argv);
+
+
+/**
+ * @brief rls listener process.
+*/
+void rls_listener(void);
 
 
 

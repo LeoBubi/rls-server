@@ -14,6 +14,10 @@
 #include <fcntl.h>
 #include <linux/limits.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
 
 #include "defines.h"
 

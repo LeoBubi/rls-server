@@ -5,12 +5,14 @@ pid_t listener_pid;
 
 
 void controlled_shutdown(int signo) {
+    if (signo); // suppress warning
     kill(listener_pid, SIGUSR1);
     waitpid(listener_pid, NULL, 0);
     exit(EXIT_SUCCESS);
 }
 
 void abnormal_shutdown(int signo) {
+    if (signo); // suppress warning
     waitpid(listener_pid, NULL, 0);
     exit(EXIT_FAILURE);
 }
