@@ -11,7 +11,7 @@ int client_socket;    // client socket file descriptor
 #define destroy_zombies() while(waitpid(-1, NULL, WNOHANG) > 0)
 
 
-int controlled_shutdown(int signo) {
+void controlled_shutdown(int signo) {
     if (signo); // suppress warning
     close(server_socket);
     // close client socket if open
