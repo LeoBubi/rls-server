@@ -94,7 +94,7 @@ rls_listener(void)
             
             if (handler_pid == 0) {
                 close(server_socket);
-                rls_handler(client_socket); // never returns
+                rls_handler(); // never returns
             }
 
             if (handler_pid > 0)
