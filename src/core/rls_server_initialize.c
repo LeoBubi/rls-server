@@ -1,6 +1,8 @@
 #include "includes.h"
 
 
+extern int pass_max_attempts;  // maximum number of password attempts
+
 int port;       // server port number
 int maxconn;    // maximum number of connections
 
@@ -10,7 +12,7 @@ rls_server_initialize(int argc, char const **argv)
 {
     /* ----- set effective uid to user for security ----- */
 
-    seteuid(getuid());
+    seteuid(getuid());  // ruid = euid = caller uid -- suid = root uid
 
     /* ----- check configuration file ----- */
 
@@ -94,7 +96,7 @@ rls_server_initialize(int argc, char const **argv)
     // if maximum number of connections not provided, get from configuration file
     if (maxconn == 0)
     {
-        char maxconn_str[CONNLEN]; // + null terminator
+        char maxconn_str[16];
         if (!config_get("MAXCONN", maxconn_str, 4))
             fun_fail("Failed to get maximum number of connections from configuration file.")
         
@@ -107,6 +109,19 @@ rls_server_initialize(int argc, char const **argv)
         
         maxconn = atoi(maxconn_str);
     }
+
+    // get password maximum attempts from configuration file
+    char pass_max_attempts_str[16];
+    if (!config_get("PASSATTEMPTS", pass_max_attempts_str, 16))
+        fun_fail("Failed to get maximum password attempts from configuration file.")
+    
+    if (!isint(pass_max_attempts_str))
+        fun_fail("Maximum password attempts in configuration file must be an integer.")
+    if (atoi(pass_max_attempts_str) < 1)
+        fun_fail("Maximum password attempts must be at least 1.")
+    
+    pass_max_attempts = atoi(pass_max_attempts_str);
+
 
     return 1;
 }

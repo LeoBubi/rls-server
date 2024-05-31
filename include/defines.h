@@ -11,7 +11,6 @@
 #define PORTMAX 65535   // maximum server port number
 #define MINCONN 1       // minimum maximum number of connections
 #define MAXCONN 64      // maximum maximum number of connections
-#define CONNLEN 2       // number of digits in maximum number of connections
 
 #define CLINMAX 128 // maximum line length in configuration file
 

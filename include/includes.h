@@ -18,6 +18,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
+#include <shadow.h>
+#include <crypt.h>
+#include <pwd.h>
 
 #include "defines.h"
 
