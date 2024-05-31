@@ -14,7 +14,8 @@ int client_socket;    // client socket file descriptor
 int controlled_shutdown(int signo) {
     if (signo); // suppress warning
     close(server_socket);
-    if (fcntl(client_socket, F_GETFD) != -1) {  // check if client socket is open
+    // close client socket if open
+    if (fcntl(client_socket, F_GETFD) != -1) {
         sndack(client_socket, 50);
         close(client_socket);
     }
