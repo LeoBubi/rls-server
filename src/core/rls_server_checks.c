@@ -31,7 +31,6 @@ rls_server_checks(void)
     uid_t ruid, euid, suid;
 
     getresuid(&ruid, &euid, &suid);
-    printf("%d\t%d\t%d\n", ruid, euid, suid);
 
     // real uid must NOT be root
     if (ruid == 0)
