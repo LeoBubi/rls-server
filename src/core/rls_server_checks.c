@@ -3,29 +3,6 @@
 int
 rls_server_checks(void)
 {
-    /* ----- make sure only one rls-server instance is running ----- */
-
-    if (open("/tmp/rls_server_running_already", O_RDONLY | O_CREAT | O_EXCL, 00600) == -1) {
-        if (errno = EEXIST)
-            fprintf(stderr, "rls-server is already active.\n");
-        else {
-#ifdef __DEBUG
-            perror("rls-server: open");
-#else
-            fprintf(stderr, "Unable to start rls-server.\n");
-#endif
-        }
-        exit(EXIT_FAILURE);
-    }
-
-    if (unlink("/tmp/rls_server_running_already") == -1) {
-#ifdef __DEBUG
-        perror("rls-server: unlink");
-#endif
-        fprintf(stderr, "FATAL ERROR: PLEASE REMOVE /tmp/rls_server_running_already");
-        exit(EXIT_FAILURE);
-    }
-
     /* ----- Check RESuid ----- */
 
     uid_t ruid, euid, suid;
