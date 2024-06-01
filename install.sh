@@ -38,6 +38,15 @@ else
     exit 1
 fi
 
+# Elevate permissions of rls-server
+chmod u+s /usr/local/bin/rls-server
+if [ $? -eq 0 ]; then
+    echo "Elevated rls-server permissions."
+else
+    echo "Failed to elevate rls-server permissions"
+    exit 1
+fi
+
 # Remove object files
 make cleaninstall
 if [ $? -eq 0 ]; then
