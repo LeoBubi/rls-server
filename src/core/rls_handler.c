@@ -89,6 +89,7 @@ rls_handler(void)
     }
 
     char *shell = pw->pw_shell;     // save shell
+    uid_t uid = pw->pw_uid;         // save uid
 
     sndack(client_socket, 20);  // username ok
 
@@ -122,14 +123,7 @@ rls_handler(void)
 
     /* ----- change uids ----- */
 
-    struct passwd *pw = getpwnam(sp->sp_namp);
-    if (pw == NULL) {
-        sndack(client_socket, 50);
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-
-    setresuid(pw->pw_uid, pw->pw_uid, pw->pw_uid);
+    setresuid(uid, uid, uid);
 
     /* ----- open terminal session ----- */
 
