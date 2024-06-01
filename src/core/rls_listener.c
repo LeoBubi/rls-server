@@ -12,7 +12,7 @@ int client_socket;    // client socket file descriptor
 
 
 void controlled_shutdown(int signo) {
-    if (signo); // suppress warning
+    if (signo){;} // suppress warning
     close(server_socket);
     // close client socket if open
     if (fcntl(client_socket, F_GETFD) != -1) {
@@ -20,7 +20,7 @@ void controlled_shutdown(int signo) {
         close(client_socket);
     }
     kill(0, SIGUSR1);
-    while(wait(NULL) > 0);
+    while(wait(NULL) > 0){;}
     _exit(EXIT_SUCCESS);
 }
 

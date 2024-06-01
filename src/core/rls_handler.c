@@ -9,7 +9,7 @@ int pass_max_attempts;      // maximum number of password attempts
 
 
 void controlled_shutdown(int signo) {
-    if (signo); // suppress warning
+    if (signo){;} // suppress warning
     sndack(client_socket, 50);
     close(client_socket);
     _exit(EXIT_SUCCESS);
