@@ -5,6 +5,8 @@ extern int client_socket;   // client socket file descriptor
 
 int pass_max_attempts;      // maximum number of password attempts
 
+#define killshell() close(toshell[1]); close(fromshell[0]); kill(shell_pid, SIGKILL)
+
 
 void controlled_shutdown(int signo) {
     if (signo); // suppress warning
@@ -187,5 +189,108 @@ rls_handler(void)
 
     /* HANDLER */
 
-    
+    close(toshell[0]);
+    close(fromshell[1]);
+
+    fd_set __readfds;
+    FD_ZERO(&__readfds);
+    FD_SET(client_socket, &__readfds);
+    FD_SET(fromshell[0], &__readfds);
+
+    while (1)
+    {
+        /* ----- wait for client message or shell output ----- */
+
+        fd_set readfds = __readfds;
+        if (select((client_socket > fromshell[0] ? client_socket : fromshell[0]) + 1, &readfds, NULL, NULL, NULL) == -1) {
+            sndack(client_socket, 50);
+            killshell();
+            exit(EXIT_FAILURE);
+        }
+
+        /* ----- client message ----- */
+
+        if (FD_ISSET(client_socket, &readfds))
+        {
+            char *msg = getmsg(client_socket, &type);
+            if (msg == NULL) {
+                sndack(client_socket, 50);
+                close(client_socket);
+                killshell();
+                exit(EXIT_FAILURE);
+            }
+
+            switch (type)
+            {
+                case TXTMSG:
+                    if (write(toshell[1], msg, strlen(msg)+1) == -1) {
+                        sndack(client_socket, 50);
+                        free(msg);
+                        close(client_socket);
+                        killshell();
+                        exit(EXIT_FAILURE);
+                    }
+                    sndack(client_socket, 20);
+                    break;
+
+                case SIGMSG:
+                    if (kill(shell_pid, *(sig_t*)msg) == -1) {
+                        sndack(client_socket, 50);
+                        free(msg);
+                        close(client_socket);
+                        killshell();
+                        exit(EXIT_FAILURE);
+                    }
+                    sndack(client_socket, 20);
+                    break;
+                
+                case CTLMSG:
+                    switch (*(ctl_t*)msg)
+                    {
+                        case CTLQUIT:
+                            sndack(client_socket, 20);
+                            free(msg);
+                            close(client_socket);
+                            killshell();
+                            exit(EXIT_SUCCESS);
+                        
+                        default:
+                            sndack(client_socket, 40);
+                    }
+                    break;
+
+                default:
+                    sndack(client_socket, 40);
+            }
+
+            free(msg);
+        }
+
+        /* ----- shell output ----- */
+
+        else if (FD_ISSET(fromshell[0], &readfds))
+        {
+            char buf[BUFSIZ];
+            ssize_t rb = read(fromshell[0], buf, BUFSIZ);
+            if (rb == -1) {
+                sndack(client_socket, 50);
+                close(client_socket);
+                killshell();
+                exit(EXIT_FAILURE);
+            }
+
+            if (rb == 0) {  // shell closed
+                sndack(client_socket, 50);
+                close(client_socket);
+                killshell();
+                exit(EXIT_FAILURE);
+            }
+
+            if (!sndmsg(client_socket, buf)) {
+                close(client_socket);
+                killshell();
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
 }

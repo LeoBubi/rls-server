@@ -21,6 +21,7 @@
 #include <shadow.h>
 #include <crypt.h>
 #include <pwd.h>
+#include <sys/select.h>
 
 #include "defines.h"
 
