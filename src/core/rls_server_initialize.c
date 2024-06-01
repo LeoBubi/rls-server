@@ -1,6 +1,9 @@
 #include "includes.h"
 
 
+const char *CONFIG_FILE = "/etc/rls-server/rls-server.conf";    // configuration file path
+
+
 extern int pass_max_attempts;  // maximum number of password attempts
 
 int port;       // server port number

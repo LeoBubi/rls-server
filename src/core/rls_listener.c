@@ -11,7 +11,7 @@ int client_socket;    // client socket file descriptor
 #define destroy_zombies() while(waitpid(-1, NULL, WNOHANG) > 0)
 
 
-void controlled_shutdown(int signo) {
+void listener_shutdown(int signo) {
     if (signo){;} // suppress warning
     close(server_socket);
     // close client socket if open
@@ -32,7 +32,7 @@ rls_listener(void)
 
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = controlled_shutdown;
+    sa.sa_handler = listener_shutdown;
     sigaction(SIGUSR1, &sa, NULL);
 
 

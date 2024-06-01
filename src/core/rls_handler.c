@@ -8,7 +8,7 @@ int pass_max_attempts;      // maximum number of password attempts
 #define killshell() close(toshell[1]); close(fromshell[0]); kill(shell_pid, SIGKILL)
 
 
-void controlled_shutdown(int signo) {
+void handler_shutdown(int signo) {
     if (signo){;} // suppress warning
     sndack(client_socket, 50);
     close(client_socket);
@@ -25,7 +25,7 @@ rls_handler(void)
 
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = controlled_shutdown;
+    sa.sa_handler = handler_shutdown;
     sigaction(SIGUSR1, &sa, NULL);
 
     sndack(client_socket, 20);

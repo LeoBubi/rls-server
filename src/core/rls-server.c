@@ -4,14 +4,14 @@
 pid_t listener_pid;
 
 
-void controlled_shutdown(int signo) {
+void server_shutdown(int signo) {
     if (signo){;} // suppress warning
     kill(listener_pid, SIGUSR1);
     waitpid(listener_pid, NULL, 0);
     exit(EXIT_SUCCESS);
 }
 
-void abnormal_shutdown(int signo) {
+void abnormal_termination(int signo) {
     if (signo){;} // suppress warning
     waitpid(listener_pid, NULL, 0);
     exit(EXIT_FAILURE);
@@ -67,11 +67,11 @@ main(int argc, char const *argv[])
     sigaddset(&sa.sa_mask, SIGQUIT);
     sigaddset(&sa.sa_mask, SIGUSR2);
 
-    sa.sa_handler = controlled_shutdown;
+    sa.sa_handler = server_shutdown;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGQUIT, &sa, NULL);
 
-    sa.sa_handler = abnormal_shutdown;
+    sa.sa_handler = abnormal_termination;
     sigaction(SIGUSR2, &sa, NULL);
 
     /* ----- monitor user input ----- */

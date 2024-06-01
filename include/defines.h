@@ -4,7 +4,7 @@
 #include <includes.h>
 
 
-#define CONFIG_FILE "/etc/rls-server/rls-server.conf"
+extern const char *CONFIG_FILE; // configuration file path
 
 
 #define PORTMIN 1       // minimum server port number
