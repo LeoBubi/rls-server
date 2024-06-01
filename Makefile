@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -pedantic -std=c17 -I include
+LDFLAGS = -lcrypt
 
 SRCDIR = src
 SRCS = $(wildcard $(SRCDIR)/core/*.c) $(wildcard $(SRCDIR)/io/*.c) $(wildcard $(SRCDIR)/utils/*.c)
@@ -22,7 +23,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 # Link object files into the target executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 # Clean up object files, target executable, and obj directory
 clean:
