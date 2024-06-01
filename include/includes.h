@@ -22,6 +22,7 @@
 #include <crypt.h>
 #include <pwd.h>
 #include <sys/select.h>
+#include <errno.h>
 
 #include "defines.h"
 
