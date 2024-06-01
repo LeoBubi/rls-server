@@ -55,6 +55,8 @@ rls_listener(void)
         _exit(EXIT_FAILURE);
     }
 
+    seteuid(0);     // gain root privileges
+
     // bind socket
     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
 #ifdef __DEBUG
@@ -65,6 +67,8 @@ rls_listener(void)
         kill(getppid(), SIGUSR2);
         _exit(EXIT_FAILURE);
     }
+
+    seteuid(getuid());  // drop root privileges
 
     // make socket passive
     if (listen(server_socket, (maxconn < SOMAXCONN ? maxconn : SOMAXCONN)) == -1) {
