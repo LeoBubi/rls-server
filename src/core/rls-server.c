@@ -21,29 +21,6 @@ void abnormal_termination(int signo) {
 int
 main(int argc, char const *argv[])
 {
-    /* ----- make sure only one rls-server instance is running ----- */
-
-    if (open("/tmp/rls_server_running_already", O_RDONLY | O_CREAT | O_EXCL, 00600) == -1) {
-        if (errno = EEXIST)
-            fprintf(stderr, "rls-server is already active.\n");
-        else {
-#ifdef __DEBUG
-            perror("rls-server: open");
-#else
-            fprintf(stderr, "Unable to start rls-server.\n");
-#endif
-        }
-        exit(EXIT_FAILURE);
-    }
-
-    if (unlink("/tmp/rls_server_running_already") == -1) {
-#ifdef __DEBUG
-        perror("rls-server: unlink");
-#endif
-        fprintf(stderr, "FATAL ERROR: PLEASE REMOVE /tmp/rls_server_running_already");
-        exit(EXIT_FAILURE);
-    }
-
     /* ----- initial checks ----- */
 
     if (!rls_server_checks())
