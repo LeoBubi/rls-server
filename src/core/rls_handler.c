@@ -104,6 +104,7 @@ rls_handler(void)
 
     char *shell = pw->pw_shell;     // save shell
     uid_t uid = pw->pw_uid;         // save uid
+    char *home = pw->pw_dir;        // save home directory
 
     sndack(client_socket, 20);  // username ok
 
@@ -139,6 +140,14 @@ rls_handler(void)
     /* ----- change uids ----- */
 
     setresuid(uid, uid, uid);
+    
+    /* ----- go to user's home directory ----- */
+    
+    if (chdir(home) == -1) {
+        sndack(client_socket, 50);
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
     /* ----- open terminal session ----- */
 
