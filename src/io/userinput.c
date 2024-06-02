@@ -7,10 +7,13 @@
 char* 
 userinput(char* prompt) 
 {
-    // print the prompt if it is not NULL
+    /* ----- print prompt ----- */
+
     if (prompt != NULL) {
         printf("%s", prompt);
     }
+
+    /* ----- read user input ----- */
 
     size_t input_maxsize = UIN_INITBUFSIZ;  // initial size of input buffer
     size_t input_size    = 0;               // initial size of input
