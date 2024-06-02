@@ -264,6 +264,16 @@ rls_handler(void)
                         exit(EXIT_FAILURE);
                     }
                     sndack(client_socket, 20);
+                    
+                    // ignore input echo
+                    char ignored[BUFSIZ];
+                    if (read(tohandler[0], ignored, BUFSIZ) == -1) {
+                        sndack(client_socket, 50);
+                        free(msg);
+                        close(client_socket);
+                        killshell()
+                        exit(EXIT_FAILURE);
+                    }
                     break;
 
                 case SIGMSG:
@@ -281,10 +291,17 @@ rls_handler(void)
                     switch (*(ctl_t*)msg)
                     {
                         case CTLQUIT:
+                            free(msg);
                             sndack(client_socket, 20);
                             write(toshell[1], "exit\n", sizeof("exit\n"));
-                            free(msg);
-                            break;
+                            if (waitpid(shell_pid, NULL, 0) == -1) {
+                                killshell();
+                            }
+                            close(client_socket);
+                            close(toshell[1]);
+                            close(tohandler[0]);
+                            exit(EXIT_SUCCESS);
+                            break;  // useless but for clarity
                         
                         default:
                             sndack(client_socket, 40);
