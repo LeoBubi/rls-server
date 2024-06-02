@@ -7,7 +7,7 @@ int pass_max_attempts;      // maximum number of password attempts
 
 #define killshell() { \
     close(toshell[1]); \
-    close(fromshell[0]); \
+    close(tohandler[0]); \
     kill(shell_pid, SIGKILL); \
 }
 
@@ -72,7 +72,7 @@ rls_handler(void)
         exit(EXIT_SUCCESS);
     }
 
-    // get user shadow record
+    /* ----- acquire user info ----- */
 
     seteuid(0);     // gain root privileges
 
@@ -88,24 +88,20 @@ rls_handler(void)
         exit(EXIT_SUCCESS);
     }
 
-    char *hashpass = sp->sp_pwdp;   // save hash password
-
-    // get user passwd record
-
     struct passwd *pw = getpwnam(sp->sp_namp);
     if (pw == NULL) {
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
-    }
+    } 
 
-    // check if user is assigned a shell
-    if (pw->pw_shell == NULL || pw->pw_shell[0] == '\0') {
+    if (pw->pw_shell == NULL || pw->pw_shell[0] == '\0') {  // no shell assigned
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
     }
 
+    char *hashpass = sp->sp_pwdp;   // save password hash
     char *shell = pw->pw_shell;     // save shell
     uid_t uid = pw->pw_uid;         // save uid
     char *home = pw->pw_dir;        // save home directory
@@ -145,14 +141,17 @@ rls_handler(void)
 
     setresuid(-1, 0, -1);   // gain root privileges
 
-    clearenv(); // clear environment
+    // set environment variables
+    clearenv();
     setenv("HOME", home, 1);
     setenv("USER", pw->pw_name, 1);
     setenv("LOGNAME", pw->pw_name, 1);
     setenv("SHELL", shell, 1);
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
     setenv("LANG", "en_US.UTF-8", 1);
+    setenv("PS1", "\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$", 1);
     
+    // go to user home directory
     if (chdir(home) == -1) {
 #ifdef __DEBUG
         perror("chdir");
@@ -162,19 +161,20 @@ rls_handler(void)
         exit(EXIT_FAILURE);
     }
 
+    // set user id
     setresuid(uid, uid, uid);    // drop root privileges and become the new user
 
     /* ----- open terminal session ----- */
 
-    int toshell[2];
+    int toshell[2];     // handler to shell
     if (pipe(toshell) == -1) {
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
     }
 
-    int fromshell[2];
-    if (pipe(fromshell) == -1) {
+    int tohandler[2];   // shell to handler
+    if (pipe(tohandler) == -1) {
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
@@ -186,8 +186,8 @@ rls_handler(void)
         close(client_socket);
         close(toshell[0]);
         close(toshell[1]);
-        close(fromshell[0]);
-        close(fromshell[1]);
+        close(tohandler[0]);
+        close(tohandler[1]);
         exit(EXIT_FAILURE);
     }
 
@@ -203,14 +203,14 @@ rls_handler(void)
         /* ----- setup file descriptors ----- */
 
         close(toshell[1]);
-        close(fromshell[0]);
+        close(tohandler[0]);
 
         dup2(toshell[0], STDIN_FILENO);
-        dup2(fromshell[1], STDOUT_FILENO);
-        dup2(fromshell[1], STDERR_FILENO);
+        dup2(tohandler[1], STDOUT_FILENO);
+        dup2(tohandler[1], STDERR_FILENO);
 
         close(toshell[0]);
-        close(fromshell[1]);
+        close(tohandler[1]);
 
         sndack(client_socket, 20);  // terminal session ready to start
 
@@ -223,19 +223,19 @@ rls_handler(void)
     /* HANDLER */
 
     close(toshell[0]);
-    close(fromshell[1]);
+    close(tohandler[1]);
 
     fd_set __readfds;
     FD_ZERO(&__readfds);
     FD_SET(client_socket, &__readfds);
-    FD_SET(fromshell[0], &__readfds);
+    FD_SET(tohandler[0], &__readfds);
 
     while (1)
     {
         /* ----- wait for client message or shell output ----- */
 
         fd_set readfds = __readfds;
-        if (select((client_socket > fromshell[0] ? client_socket : fromshell[0]) + 1, &readfds, NULL, NULL, NULL) == -1) {
+        if (select((client_socket > tohandler[0] ? client_socket : tohandler[0]) + 1, &readfds, NULL, NULL, NULL) == -1) {
             sndack(client_socket, 50);
             killshell()
             exit(EXIT_FAILURE);
@@ -301,11 +301,11 @@ rls_handler(void)
 
         /* ----- shell output ----- */
 
-        else if (FD_ISSET(fromshell[0], &readfds))
+        else if (FD_ISSET(tohandler[0], &readfds))
         {
             char buf[BUFSIZ];
             memset(buf, '\0', BUFSIZ);
-            ssize_t rb = read(fromshell[0], buf, BUFSIZ);
+            ssize_t rb = read(tohandler[0], buf, BUFSIZ);
             if (rb == -1) {
                 sndack(client_socket, 50);
                 close(client_socket);
