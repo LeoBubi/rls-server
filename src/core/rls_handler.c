@@ -144,6 +144,9 @@ rls_handler(void)
     /* ----- go to user's home directory ----- */
     
     if (chdir(home) == -1) {
+#ifdef __DEBUG
+        perror("chdir");
+#endif
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
