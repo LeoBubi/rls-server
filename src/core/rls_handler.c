@@ -109,14 +109,9 @@ rls_handler(void)
 
     /* ----- receive password ----- */
 
-    for (int attempts = 1;; attempts++)
+    int attempts = 0;
+    while (1)
     {
-        if (attempts > pass_max_attempts) {
-            sndack(client_socket, 41);
-            close(client_socket);
-            exit(EXIT_FAILURE);
-        }
-
         char *password = getmsg(client_socket, &type);
         if (password == NULL) {
             sndack(client_socket, 50);
@@ -132,6 +127,12 @@ rls_handler(void)
         }
 
         free(password);
+        
+        if (++attempts >= pass_max_attempts) {
+            sndack(client_socket, 41);  // too many attempts
+            close(client_socket);
+            exit(EXIT_SUCCESS); 
+        }
         sndack(client_socket, 40);  // password incorrect
     }
 
