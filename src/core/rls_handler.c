@@ -5,7 +5,11 @@ extern int client_socket;   // client socket file descriptor
 
 int pass_max_attempts;      // maximum number of password attempts
 
-#define killshell() close(toshell[1]); close(fromshell[0]); kill(shell_pid, SIGKILL)
+#define killshell() { \
+    close(toshell[1]); \
+    close(fromshell[0]); \
+    kill(shell_pid, SIGKILL); \
+}
 
 // to be called at exit
 void client_disconnected(void) {
@@ -233,7 +237,7 @@ rls_handler(void)
         fd_set readfds = __readfds;
         if (select((client_socket > fromshell[0] ? client_socket : fromshell[0]) + 1, &readfds, NULL, NULL, NULL) == -1) {
             sndack(client_socket, 50);
-            killshell();
+            killshell()
             exit(EXIT_FAILURE);
         }
 
@@ -245,7 +249,7 @@ rls_handler(void)
             if (msg == NULL) {
                 sndack(client_socket, 50);
                 close(client_socket);
-                killshell();
+                killshell()
                 exit(EXIT_FAILURE);
             }
 
@@ -256,7 +260,7 @@ rls_handler(void)
                         sndack(client_socket, 50);
                         free(msg);
                         close(client_socket);
-                        killshell();
+                        killshell()
                         exit(EXIT_FAILURE);
                     }
                     sndack(client_socket, 20);
@@ -267,7 +271,7 @@ rls_handler(void)
                         sndack(client_socket, 50);
                         free(msg);
                         close(client_socket);
-                        killshell();
+                        killshell()
                         exit(EXIT_FAILURE);
                     }
                     sndack(client_socket, 20);
@@ -280,7 +284,7 @@ rls_handler(void)
                             sndack(client_socket, 20);
                             free(msg);
                             close(client_socket);
-                            killshell();
+                            killshell()
                             exit(EXIT_SUCCESS);
                         
                         default:
@@ -305,20 +309,20 @@ rls_handler(void)
             if (rb == -1) {
                 sndack(client_socket, 50);
                 close(client_socket);
-                killshell();
+                killshell()
                 exit(EXIT_FAILURE);
             }
 
             if (rb == 0) {  // shell closed
                 sndack(client_socket, 50);
                 close(client_socket);
-                killshell();
+                killshell()
                 exit(EXIT_FAILURE);
             }
 
             if (!sndmsg(client_socket, buf)) {
                 close(client_socket);
-                killshell();
+                killshell()
                 exit(EXIT_FAILURE);
             }
         }
