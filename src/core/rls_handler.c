@@ -127,7 +127,7 @@ rls_handler(void)
         }
 
         free(password);
-        
+
         if (++attempts >= pass_max_attempts) {
             sndack(client_socket, 41);  // too many attempts
             close(client_socket);
@@ -280,6 +280,7 @@ rls_handler(void)
         else if (FD_ISSET(fromshell[0], &readfds))
         {
             char buf[BUFSIZ];
+            memset(buf, '\0', BUFSIZ);
             ssize_t rb = read(fromshell[0], buf, BUFSIZ);
             if (rb == -1) {
                 sndack(client_socket, 50);
