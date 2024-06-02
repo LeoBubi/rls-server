@@ -149,7 +149,7 @@ rls_handler(void)
     setenv("SHELL", shell, 1);
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
     setenv("LANG", "en_US.UTF-8", 1);
-    setenv("PS1", "\\[\\e]0;\\u@\\h: \\w\\a\\]${debian_chroot:+($debian_chroot)}\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$", 1);
+    setenv("TERM", "xterm-256color", 1);
     
     // go to user home directory
     if (chdir(home) == -1) {
@@ -216,7 +216,7 @@ rls_handler(void)
 
         /* ----- execute shell ----- */
 
-        execl(shell, shell, NULL);
+        execl(shell, shell, "-i", NULL);
         exit(EXIT_FAILURE);
     }
 
@@ -282,10 +282,9 @@ rls_handler(void)
                     {
                         case CTLQUIT:
                             sndack(client_socket, 20);
+                            write(toshell[1], "exit\n", sizeof("exit\n"));
                             free(msg);
-                            close(client_socket);
-                            killshell()
-                            exit(EXIT_SUCCESS);
+                            break;
                         
                         default:
                             sndack(client_socket, 40);
@@ -305,7 +304,7 @@ rls_handler(void)
         {
             char buf[BUFSIZ];
             memset(buf, '\0', BUFSIZ);
-            ssize_t rb = read(tohandler[0], buf, BUFSIZ);
+            ssize_t rb = read(tohandler[0], buf, BUFSIZ-1);
             if (rb == -1) {
                 sndack(client_socket, 50);
                 close(client_socket);
@@ -317,7 +316,7 @@ rls_handler(void)
                 sndack(client_socket, 50);
                 close(client_socket);
                 killshell()
-                exit(EXIT_FAILURE);
+                exit(EXIT_SUCCESS);
             }
 
             if (!sndmsg(client_socket, buf)) {
