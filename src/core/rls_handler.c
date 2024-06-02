@@ -7,6 +7,12 @@ int pass_max_attempts;      // maximum number of password attempts
 
 #define killshell() close(toshell[1]); close(fromshell[0]); kill(shell_pid, SIGKILL)
 
+// to be called at exit
+void client_disconnected(void) {
+    printf("Client disconnected.\n");
+    return;
+}
+
 
 void handler_shutdown(int signo) {
     if (signo){;} // suppress warning
@@ -20,6 +26,14 @@ void
 rls_handler(void)
 {
     char type;  // message type
+
+    /* ----- register atexit functions ----- */
+
+    if (atexit(client_disconnected) != 0) {
+        sndack(client_socket, 50);
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
     /* ----- set signal handlers ----- */
 
