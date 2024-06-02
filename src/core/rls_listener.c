@@ -81,11 +81,16 @@ rls_listener(void)
         _exit(EXIT_FAILURE);
     }
 
+    printf("Listening for client connections on port %d...\n", port);
+
     /* ----- accept new client connetion ----- */
 
     while (1)
     {
-        client_socket = accept(server_socket, NULL, NULL);
+        struct sockaddr_in client_addr;
+        socklen_t client_addr_len = sizeof(client_addr);
+
+        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_addr_len);
 #ifdef __DEBUG
         if (client_socket == -1) {
             perror("rls_listener: accept");
@@ -94,6 +99,8 @@ rls_listener(void)
         
         if (client_socket > 0)
         {
+            printf("\n----- New client connection from %s:%d\n\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
             int handler_pid = fork();
             
             if (handler_pid == 0) {
