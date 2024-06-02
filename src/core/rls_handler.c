@@ -137,11 +137,17 @@ rls_handler(void)
         sndack(client_socket, 40);  // password incorrect
     }
 
-    /* ----- change uids ----- */
+    /* ----- become the new user ----- */
 
-    setresuid(uid, uid, uid);
-    
-    /* ----- go to user's home directory ----- */
+    setresuid(-1, 0, -1);   // gain root privileges
+
+    clearenv(); // clear environment
+    setenv("HOME", home, 1);
+    setenv("USER", pw->pw_name, 1);
+    setenv("LOGNAME", pw->pw_name, 1);
+    setenv("SHELL", shell, 1);
+    setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
+    setenv("LANG", "en_US.UTF-8", 1);
     
     if (chdir(home) == -1) {
 #ifdef __DEBUG
@@ -151,6 +157,8 @@ rls_handler(void)
         close(client_socket);
         exit(EXIT_FAILURE);
     }
+
+    setresuid(uid, uid, uid);    // drop root privileges and become the new user
 
     /* ----- open terminal session ----- */
 
