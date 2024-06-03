@@ -23,6 +23,7 @@
 #include <pwd.h>
 #include <sys/select.h>
 #include <errno.h>
+#include <grp.h>
 
 #include "defines.h"
 

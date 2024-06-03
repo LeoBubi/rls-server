@@ -101,6 +101,7 @@ rls_handler(void)
         exit(EXIT_SUCCESS);
     }
 
+    username = pw->pw_name;         // save username
     char *hashpass = sp->sp_pwdp;   // save password hash
     char *shell = pw->pw_shell;     // save shell
     uid_t uid = pw->pw_uid;         // save uid
@@ -164,6 +165,7 @@ rls_handler(void)
 
     // drop root privileges and become the new user
     setresgid(gid, gid, gid);
+    initgroups(username, gid);
     setresuid(uid, uid, uid);
 
     /* ----- open terminal session ----- */
