@@ -6,8 +6,7 @@ pid_t listener_pid;
 
 void server_shutdown(int signo) {
     if (signo){;} // suppress warning
-    printf("Shutting down server...\n");
-    fflush(stdout);
+    write(STDOUT_FILENO, "Shutting down server...\n", sizeof("Shutting down server...\n"));
     kill(listener_pid, SIGUSR1);
     waitpid(listener_pid, NULL, 0);
     exit(EXIT_SUCCESS);

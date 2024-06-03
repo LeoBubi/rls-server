@@ -13,8 +13,7 @@ int client_socket;    // client socket file descriptor
 
 void listener_shutdown(int signo) {
     if (signo){;} // suppress warning
-    printf("Shutting down listener...\n");
-    fflush(stdout);
+    write(STDOUT_FILENO, "Shutting down listener...\n", sizeof("Shutting down listener...\n"));
     close(server_socket);
     // close client socket if open
     if (fcntl(client_socket, F_GETFD) != -1) {

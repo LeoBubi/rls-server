@@ -20,8 +20,7 @@ void client_disconnected(void) {
 
 void handler_shutdown(int signo) {
     if (signo){;} // suppress warning
-    printf("Shutting down handler...\n");
-    fflush(stdout);
+    write(STDOUT_FILENO, "Shutting down handler...\n", sizeof("Shutting down handler...\n"));
     sndack(client_socket, 50);
     close(client_socket);
     _exit(EXIT_SUCCESS);
