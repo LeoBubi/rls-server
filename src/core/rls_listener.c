@@ -13,13 +13,17 @@ int client_socket;    // client socket file descriptor
 
 void listener_shutdown(int signo) {
     if (signo){;} // suppress warning
+    printf("Shutting down listener...\n");
+    fflush(stdout);
     close(server_socket);
     // close client socket if open
     if (fcntl(client_socket, F_GETFD) != -1) {
         sndack(client_socket, 50);
         close(client_socket);
     }
+    seteuid(0);     // gain root privileges
     kill(0, SIGUSR1);
+    seteuid(getuid());  // drop root privileges
     while(wait(NULL) > 0){;}
     _exit(EXIT_SUCCESS);
 }
