@@ -104,6 +104,7 @@ rls_handler(void)
     char *hashpass = sp->sp_pwdp;   // save password hash
     char *shell = pw->pw_shell;     // save shell
     uid_t uid = pw->pw_uid;         // save uid
+    gid_t gid = pw->pw_gid;         // save gid
     char *home = pw->pw_dir;        // save home directory
 
     sndack(client_socket, 20);  // username ok
@@ -161,8 +162,9 @@ rls_handler(void)
         exit(EXIT_FAILURE);
     }
 
-    // set user id
-    setresuid(uid, uid, uid);    // drop root privileges and become the new user
+    // drop root privileges and become the new user
+    setresgid(gid, gid, gid);
+    setresuid(uid, uid, uid);
 
     /* ----- open terminal session ----- */
 
