@@ -99,6 +99,25 @@ rls_listener(void)
             perror("rls_listener: accept");
         }
 #endif
+
+        // set reading and writing timeouts
+        struct timeval timeout;
+        timeout.tv_sec = 10;
+        timeout.tv_usec = 0;
+
+        if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) == -1) {
+#ifdef __DEBUG
+            perror("rls_listener: setsockopt for reading timeout");
+#endif
+            close(client_socket);
+            continue;
+        }
+
+        if (setsockopt(client_socket, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) == -1) {
+#ifdef __DEBUG
+            perror("rls_listener: setsockopt for writing timeout");
+#endif
+        }
         
         if (client_socket > 0)
         {
