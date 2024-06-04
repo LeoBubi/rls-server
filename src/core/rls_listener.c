@@ -105,6 +105,11 @@ rls_listener(void)
             printf("\n----- New client connection from %s:%d\n\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
             int handler_pid = fork();
+#ifdef __DEBUG
+            if (handler_pid == -1) {
+                perror("rls_listener: fork");
+            }
+#endif
             
             if (handler_pid == 0) {
                 close(server_socket);

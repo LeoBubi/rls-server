@@ -47,7 +47,11 @@ rls_handler(void)
     sa.sa_handler = handler_shutdown;
     sigaction(SIGUSR1, &sa, NULL);
 
-    sndack(client_socket, 20);
+    if (!sndack(client_socket, 20)) {
+        fprintf(stderr, "Failed to send connection acknowledgment.\n");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
     /* ----- receive username ----- */
 
@@ -109,7 +113,11 @@ rls_handler(void)
     gid_t gid = pw->pw_gid;         // save gid
     char *home = pw->pw_dir;        // save home directory
 
-    sndack(client_socket, 20);  // username ok
+    if (!sndack(client_socket, 20)) {
+        fprintf(stderr, "Failed to send username acknowledgment.\n");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
     /* ----- receive password ----- */
 
@@ -217,7 +225,9 @@ rls_handler(void)
         close(toshell[0]);
         close(tohandler[1]);
 
-        sndack(client_socket, 20);  // terminal session ready to start
+        if (!sndack(client_socket, 20)) {
+            exit(EXIT_FAILURE);
+        }
 
         /* ----- execute shell ----- */
 
