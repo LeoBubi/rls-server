@@ -8,9 +8,6 @@
 static char buffer[sizeof (_PATH_DEVPTS) + 20];
 
 
-int __rlsch_ptsname_r(int fd, char *buf, size_t buflen);
-
-
 char*
 rlsch_ptsname(int fd)
 {
