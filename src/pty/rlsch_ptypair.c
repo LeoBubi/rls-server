@@ -23,7 +23,7 @@ rlsch_ptypair(int* amaster, int* aslave)
         return 0;
     }
     
-    if (lsch_unlockpt(master) < 0) {
+    if (rlsch_unlockpt(master) < 0) {
 #ifdef __DEBUG
         perror("rlsch_unlockpt");
 #endif
