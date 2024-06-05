@@ -121,6 +121,36 @@ void rls_listener(void);
 void rls_handler(void);
 
 
+/**
+ * @brief reimplementation of posix_openpt.
+*/
+int rlsch_openpt(int flags);
+
+
+/**
+ * @brief reimplementation of grantpt.
+*/
+int rlsch_grantpt(int fd);
+
+
+/**
+ * @brief reimplementation of unlockpt.
+*/
+int rlsch_unlockpt(int fd);
+
+
+/**
+ * @brief reimplementation of ptsname.
+*/
+char* rlsch_ptsname(int fd);
+
+
+#ifndef _ITOA_WORD_TYPE
+# define _ITOA_WORD_TYPE	unsigned long int
+#endif
+char* _itoa_word (_ITOA_WORD_TYPE value, char *buflim, unsigned int base, int upper_case);
+
+
 
 
 

@@ -24,6 +24,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #include <grp.h>
+#include <sys/ioctl.h>
 
 #include "defines.h"
 
