@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -Werror -pedantic -std=c17 -I include -D __DEBUG
 LDFLAGS = -lcrypt
 
 SRCDIR = src
-SRCS = $(wildcard $(SRCDIR)/core/*.c) $(wildcard $(SRCDIR)/io/*.c) $(wildcard $(SRCDIR)/utils/*.c)
+SRCS = $(wildcard $(SRCDIR)/core/*.c) $(wildcard $(SRCDIR)/io/*.c) $(wildcard $(SRCDIR)/pty/*.c) $(wildcard $(SRCDIR)/utils/*.c)
 
 OBJDIR = obj
 OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
@@ -15,7 +15,7 @@ TARGET = rls-server
 #---------------------------------------------#
 
 # Create obj directory if it doesn't exist
-$(shell mkdir -p $(OBJDIR)/core $(OBJDIR)/io $(OBJDIR)/utils)
+$(shell mkdir -p $(OBJDIR)/core $(OBJDIR)/io $(OBJDIR)/pty $(OBJDIR)/utils)
 
 # Compile source files into object files
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
