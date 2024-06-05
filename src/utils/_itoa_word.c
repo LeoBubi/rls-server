@@ -1,8 +1,8 @@
 #include "includes.h"
 
 
-extern const char _itoa_upper_digits[];
-extern const char _itoa_lower_digits[];
+const char _itoa_upper_digits[256];
+const char _itoa_lower_digits[256];
 
 
 char*
