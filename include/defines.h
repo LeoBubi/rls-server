@@ -151,7 +151,13 @@ char* rlsch_ptsname(int fd);
 char* _itoa_word (_ITOA_WORD_TYPE value, char *buflim, unsigned int base, int upper_case);
 
 
-
+/**
+ * @brief Create a new pseudo-terminal file descriptor pair.
+ * @param amaster Master file descriptor.
+ * @param aslave Slave file descriptor.
+ * @return 1 if successful, 0 otherwise.
+*/
+int rlsch_ptypair(int* amaster, int* aslave);
 
 
 #endif /* _DEFINES_H */
