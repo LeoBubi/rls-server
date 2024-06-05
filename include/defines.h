@@ -145,12 +145,6 @@ int rlsch_unlockpt(int fd);
 char* rlsch_ptsname(int fd);
 
 
-#ifndef _ITOA_WORD_TYPE
-# define _ITOA_WORD_TYPE	unsigned long int
-#endif
-char* _itoa_word (_ITOA_WORD_TYPE value, char *buflim, unsigned int base, int upper_case);
-
-
 /**
  * @brief Create a new pseudo-terminal file descriptor pair.
  * @param amaster Master file descriptor.
