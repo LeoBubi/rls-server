@@ -5,10 +5,12 @@ extern int client_socket;   // client socket file descriptor
 
 int pass_max_attempts;      // maximum number of password attempts
 
+pid_t shell_pid;            // shell process id
+
 #define killshell() { \
-    close(toshell[1]); \
-    close(tohandler[0]); \
+    seteuid(0); \
     kill(shell_pid, SIGKILL); \
+    seteuid(getuid());\
 }
 
 // to be called at exit
@@ -23,6 +25,7 @@ void handler_shutdown(int signo) {
     write(STDOUT_FILENO, "Shutting down handler...\n", sizeof("Shutting down handler...\n"));
     sndack(client_socket, 50);
     close(client_socket);
+    killshell()
     _exit(EXIT_SUCCESS);
 }
 
@@ -177,30 +180,25 @@ rls_handler(void)
     initgroups(username, gid);
     setresuid(uid, uid, uid);
 
+    /* ----- open pseudoterminal file descriptors ----- */
+
+    int master, slave;
+    if (!rlsch_ptypair(&master, &slave)) {
+#ifdef __DEBUG
+        fprintf(stderr, "Failed to open pseudoterminal pair.\n");
+#endif
+        sndack(client_socket, 50);
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+
     /* ----- open terminal session ----- */
 
-    int toshell[2];     // handler to shell
-    if (pipe(toshell) == -1) {
-        sndack(client_socket, 50);
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-
-    int tohandler[2];   // shell to handler
-    if (pipe(tohandler) == -1) {
-        sndack(client_socket, 50);
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-
-    pid_t shell_pid = fork();
+    shell_pid = fork();
     if (shell_pid == -1) {
+        close(master);
+        close(slave);
         sndack(client_socket, 50);
-        close(client_socket);
-        close(toshell[0]);
-        close(toshell[1]);
-        close(tohandler[0]);
-        close(tohandler[1]);
         exit(EXIT_FAILURE);
     }
 
@@ -213,17 +211,24 @@ rls_handler(void)
         sa.sa_handler = SIG_IGN;
         sigaction(SIGUSR1, &sa, NULL);
 
+        /* ----- create a new session ----- */
+
+        setsid();
+        if (ioctl(slave, TIOCSCTTY, NULL) == -1) {
+            perror("ioctl nell'handler");
+            exit(EXIT_FAILURE);
+
+        }
+
         /* ----- setup file descriptors ----- */
 
-        close(toshell[1]);
-        close(tohandler[0]);
+        close(master);
 
-        dup2(toshell[0], STDIN_FILENO);
-        dup2(tohandler[1], STDOUT_FILENO);
-        dup2(tohandler[1], STDERR_FILENO);
+        dup2(slave, STDIN_FILENO);
+        dup2(slave, STDOUT_FILENO);
+        dup2(slave, STDERR_FILENO);
 
-        close(toshell[0]);
-        close(tohandler[1]);
+        close(slave);
 
         if (!sndack(client_socket, 20)) {
             exit(EXIT_FAILURE);
@@ -237,20 +242,19 @@ rls_handler(void)
 
     /* HANDLER */
 
-    close(toshell[0]);
-    close(tohandler[1]);
+    close(slave);
 
     fd_set __readfds;
     FD_ZERO(&__readfds);
     FD_SET(client_socket, &__readfds);
-    FD_SET(tohandler[0], &__readfds);
+    FD_SET(master, &__readfds);
 
     while (1)
     {
         /* ----- wait for client message or shell output ----- */
 
         fd_set readfds = __readfds;
-        if (select((client_socket > tohandler[0] ? client_socket : tohandler[0]) + 1, &readfds, NULL, NULL, NULL) == -1) {
+        if (select((client_socket > master ? client_socket : master) + 1, &readfds, NULL, NULL, NULL) == -1) {
             sndack(client_socket, 50);
             killshell()
             exit(EXIT_FAILURE);
@@ -271,7 +275,7 @@ rls_handler(void)
             switch (type)
             {
                 case TXTMSG:
-                    if (write(toshell[1], msg, strlen(msg)+1) == -1) {
+                    if (write(master, msg, strlen(msg)+1) == -1) {
                         sndack(client_socket, 50);
                         free(msg);
                         close(client_socket);
@@ -282,7 +286,7 @@ rls_handler(void)
                     
                     // ignore input echo
                     char ignored[BUFSIZ];
-                    if (read(tohandler[0], ignored, BUFSIZ) == -1) {
+                    if (read(master, ignored, BUFSIZ) == -1) {
                         sndack(client_socket, 50);
                         free(msg);
                         close(client_socket);
@@ -308,13 +312,12 @@ rls_handler(void)
                         case CTLQUIT:
                             free(msg);
                             sndack(client_socket, 20);
-                            write(toshell[1], "exit\n", sizeof("exit\n"));
+                            write(master, "exit\n", sizeof("exit\n"));
                             if (waitpid(shell_pid, NULL, 0) == -1) {
                                 killshell();
                             }
                             close(client_socket);
-                            close(toshell[1]);
-                            close(tohandler[0]);
+                            close(master);
                             exit(EXIT_SUCCESS);
                             break;  // useless but for clarity
                         
@@ -332,11 +335,11 @@ rls_handler(void)
 
         /* ----- shell output ----- */
 
-        else if (FD_ISSET(tohandler[0], &readfds))
+        else if (FD_ISSET(master, &readfds))
         {
             char buf[BUFSIZ];
             memset(buf, '\0', BUFSIZ);
-            ssize_t rb = read(tohandler[0], buf, BUFSIZ-1);
+            ssize_t rb = read(master, buf, BUFSIZ-1);
             if (rb == -1) {
                 sndack(client_socket, 50);
                 close(client_socket);
