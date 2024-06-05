@@ -51,7 +51,7 @@ __rlsch_ptsname_r(int fd, char *buf, size_t buflen)
         return errno;
     }
 
-    memcpy (__stpcpy (buf, devpts), p, &numbuf[sizeof (numbuf)] - p);
+    memcpy (stpcpy(buf, devpts), p, &numbuf[sizeof (numbuf)] - p);
 
     errno = saved_errno;
     return 0;
