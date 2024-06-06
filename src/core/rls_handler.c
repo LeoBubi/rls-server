@@ -47,6 +47,11 @@ rls_handler(void)
 
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = SIG_IGN;
+
+    sigaction(SIGINT,  &sa, NULL);
+    sigaction(SIGQUIT, &sa, NULL);
+
     sa.sa_handler = handler_shutdown;
     sigaction(SIGUSR1, &sa, NULL);
 

@@ -110,12 +110,6 @@ int rls_server_initialize(int argc, char const **argv);
 
 
 /**
- * @brief rls listener process.
-*/
-void rls_listener(void);
-
-
-/**
  * @brief rls handler process.
 */
 void rls_handler(void);
