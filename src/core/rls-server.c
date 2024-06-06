@@ -3,6 +3,7 @@
 
 extern int port;       // server port number
 extern int maxconn;    // maximum number of connections
+extern int connto;     // client communication delay limit
 
 int server_socket;    // server socket file descriptor
 int client_socket;    // client socket file descriptor
@@ -121,7 +122,7 @@ main(int argc, char const *argv[])
 
     // client socket r/w timeout
     struct timeval timeout; 
-    timeout.tv_sec = 10;
+    timeout.tv_sec = (time_t)connto;
     timeout.tv_usec = 0;
 
     while (1)

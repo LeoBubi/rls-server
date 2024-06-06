@@ -81,6 +81,7 @@ fi
 echo "PORT=513" > /etc/rls-server/rls-server.conf
 echo "MAXCONN=16" >> /etc/rls-server/rls-server.conf
 echo "PASSATTEMPTS=3" >> /etc/rls-server/rls-server.conf
+echo "CONNTIMEO=10" >> /etc/rls-server/rls-server.conf
 
 if [ $? -eq 0 ]; then
     echo "Initialized rls-server configuration file"
@@ -94,6 +95,7 @@ echo ""
 echo "    Default port: 513"
 echo "    Default maximum number of connections: 16"
 echo "    Defualt maximum client password attempts: 3"
+echo "    Default client communication delay limit: 10 seconds"
 echo ""
 
 exit 0

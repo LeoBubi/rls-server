@@ -8,6 +8,7 @@ extern int pass_max_attempts;  // maximum number of password attempts
 
 int port;       // server port number
 int maxconn;    // maximum number of connections
+int connto;     // client communication delay limit
 
 
 int
@@ -124,6 +125,19 @@ rls_server_initialize(int argc, char const **argv)
         fun_fail("Maximum password attempts must be at least 1.")
     
     pass_max_attempts = atoi(pass_max_attempts_str);
+
+
+    // get client communication delay limit from configuration file
+    char connto_str[16];
+    if (!config_get("CONNTIMEO", connto_str, 16))
+        fun_fail("Failed to get client communication delay limit from configuration file.")
+    
+    if (!isint(connto_str))
+        fun_fail("Maximum password attempts in configuration file must be an integer.")
+    if (atoi(connto_str) < 1)
+        fun_fail("Maximum password attempts must be at least 1.")
+    
+    connto = atoi(connto_str);
 
 
     return 1;
