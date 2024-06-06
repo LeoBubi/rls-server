@@ -1,17 +1,18 @@
 #include "includes.h"
 
 
-#define _PATH_DEVPTS "/dev/pts/"
+#define _PATH_DEVPTS  "/dev/pts/"
+#define _PATH_DEVPTMX "/dev/ptmx"
 
 
 int
 ptypair(int* amaster, int* aslave)
 {
     int master, slave;
-    char name[sizeof (_PATH_DEVPTS) + 20];
+    char name[sizeof(_PATH_DEVPTS) + 20];
 
     // equivalent to posix_openpt()
-    master = open("/dev/ptmx", O_RDWR | O_NOCTTY);
+    master = open(_PATH_DEVPTMX, O_RDWR | O_NOCTTY);
     if (master < 0) {
 #ifdef __DEBUG
         perror("ptypair: open master");
