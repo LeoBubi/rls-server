@@ -12,7 +12,7 @@ int connto;     // client communication delay limit
 
 
 int
-rls_server_initialize(int argc, char const **argv)
+rls_init(int argc, char const **argv)
 {
     /* ----- set effective uid to user for security ----- */
 

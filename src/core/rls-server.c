@@ -36,12 +36,12 @@ main(int argc, char const *argv[])
 {
     /* ----- initial checks ----- */
 
-    if (!rls_server_checks())
+    if (!rls_check())
         exit(EXIT_FAILURE);
     
     /* ----- initialize rls server ----- */
 
-    if (!rls_server_initialize(argc, argv)) {
+    if (!rls_init(argc, argv)) {
         fprintf(stderr, "Initialization failure.\n");
         exit(EXIT_FAILURE);
     }

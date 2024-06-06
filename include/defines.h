@@ -99,7 +99,7 @@ char* getmsg(int sockfd, char* type);
  * @brief rls server initial checks.
  * @return 1 if all checks are passed, 0 otherwise.
 */
-int rls_server_checks(void);
+int rls_check(void);
 
 
 /**
@@ -108,7 +108,7 @@ int rls_server_checks(void);
  * @param argv Command line arguments.
  * @return 1 if successful, 0 otherwise.
 */
-int rls_server_initialize(int argc, char const **argv);
+int rls_init(int argc, char const **argv);
 
 
 /**
