@@ -188,7 +188,7 @@ rls_handler(void)
     /* ----- open pseudoterminal file descriptors ----- */
 
     int master, slave;
-    if (!rlsch_ptypair(&master, &slave)) {
+    if (!ptypair(&master, &slave)) {
 #ifdef __DEBUG
         fprintf(stderr, "Failed to open pseudoterminal pair.\n");
 #endif

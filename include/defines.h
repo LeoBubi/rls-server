@@ -118,36 +118,12 @@ void rls_handler(void);
 
 
 /**
- * @brief reimplementation of posix_openpt.
-*/
-int rlsch_openpt(int flags);
-
-
-/**
- * @brief reimplementation of grantpt.
-*/
-int rlsch_grantpt(int fd);
-
-
-/**
- * @brief reimplementation of unlockpt.
-*/
-int rlsch_unlockpt(int fd);
-
-
-/**
- * @brief reimplementation of ptsname.
-*/
-char* rlsch_ptsname(int fd);
-
-
-/**
  * @brief Create a new pseudo-terminal file descriptor pair.
  * @param amaster Master file descriptor.
  * @param aslave Slave file descriptor.
  * @return 1 if successful, 0 otherwise.
 */
-int rlsch_ptypair(int* amaster, int* aslave);
+int ptypair(int* amaster, int* aslave);
 
 
 #endif /* _DEFINES_H */
