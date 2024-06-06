@@ -11,7 +11,6 @@ ptypair(int* amaster, int* aslave)
     int master, slave;
     char name[sizeof(_PATH_DEVPTS) + 20];
 
-    // equivalent to posix_openpt()
     master = open(_PATH_DEVPTMX, O_RDWR | O_NOCTTY);
     if (master < 0) {
 #ifdef __DEBUG
