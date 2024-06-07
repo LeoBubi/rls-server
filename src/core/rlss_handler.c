@@ -220,7 +220,7 @@ rlss_handler(void)
 
         setsid();
         if (ioctl(slave, TIOCSCTTY, NULL) == -1) {
-            perror("ioctl nell'handler");
+            perror("TIOCSCTTY ioctl");
             exit(EXIT_FAILURE);
 
         }
