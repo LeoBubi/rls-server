@@ -1,9 +1,10 @@
 #include "includes.h"
 
 
-extern int client_socket;   // client socket file descriptor
+extern int pass_max_attempts;      // maximum number of password attempts
+extern int wpdelay;                // delay between wrong password attempts
 
-int pass_max_attempts;      // maximum number of password attempts
+extern int client_socket;   // client socket file descriptor
 
 pid_t shell_pid;            // shell process id
 
@@ -153,6 +154,8 @@ rlss_handler(void)
             close(client_socket);
             exit(EXIT_SUCCESS); 
         }
+
+        sleep(wpdelay);
         sndack(client_socket, 40);  // password incorrect
     }
 

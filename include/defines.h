@@ -13,6 +13,8 @@ extern const char *CONFIG_FILE; // configuration file path
 #define MAXCONN 64      // maximum maximum number of connections
 #define MINCNTO 1       // minimum communication delay limit (seconds)
 #define MAXCNTO 3600    // maximum communication delay limit (seconds)
+#define MINDLAY 1       // minimum delay between wrong password attempts (seconds)
+#define MAXDLAY 5       // maximum delay between wrong password attempts (seconds)
 
 #define CLINMAX 128 // maximum line length in configuration file
 

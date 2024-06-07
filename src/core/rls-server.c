@@ -1,9 +1,11 @@
 #include <includes.h>
 
 
-extern int port;       // server port number
-extern int maxconn;    // maximum number of connections
-extern int connto;     // client communication delay limit
+int port;               // server port number
+int maxconn;            // maximum number of connections
+int pass_max_attempts;  // maximum number of password attempts
+int connto;             // client communication delay limit
+int wpdelay;            // delay between wrong password attempts
 
 int server_socket;    // server socket file descriptor
 int client_socket;    // client socket file descriptor

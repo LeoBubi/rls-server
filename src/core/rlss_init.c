@@ -4,11 +4,11 @@
 const char *CONFIG_FILE = "/etc/rls-server/rls-server.conf";    // configuration file path
 
 
-extern int pass_max_attempts;  // maximum number of password attempts
-
-int port;       // server port number
-int maxconn;    // maximum number of connections
-int connto;     // client communication delay limit
+extern int port;                // server port number
+extern int maxconn;             // maximum number of connections
+extern int pass_max_attempts;   // maximum number of password attempts
+extern int connto;              // client communication delay limit
+extern int wpdelay;             // delay between wrong password attempts
 
 
 int
@@ -134,10 +134,27 @@ rlss_init(int argc, char const **argv)
     
     if (!isint(connto_str))
         fun_fail("Maximum password attempts in configuration file must be an integer.")
-    if (atoi(connto_str) < 1)
-        fun_fail("Maximum password attempts must be at least 1.")
+    if (atoi(connto_str) < MINCNTO)
+        fun_fail("Client communication delay limit in configuration file too low.")
+    if (atoi(connto_str) > MAXCNTO)
+        fun_fail("Client communication delay limit in configuration file too high.")
     
     connto = atoi(connto_str);
+
+
+    // get delay between wrong password attempts from configuration file
+    char wpdelay_str[16];
+    if (!config_get("WPDELAY", wpdelay_str, 16))
+        fun_fail("Failed to get delay between wrong password attempts from configuration file.")
+    
+    if (!isint(wpdelay_str))
+        fun_fail("Delay between wrong password attempts in configuration file must be an integer.")
+    if (atoi(wpdelay_str) < MINDLAY)
+        fun_fail("Delay between wrong password attempts in configuration file too low.")
+    if (atoi(wpdelay_str) > MAXDLAY)
+        fun_fail("Delay between wrong password attempts in configuration file too high.")
+
+    wpdelay = atoi(wpdelay_str);
 
 
     return 1;
