@@ -16,8 +16,6 @@ extern const char *CONFIG_FILE; // configuration file path
 #define MINDLAY 1       // minimum delay between wrong password attempts (seconds)
 #define MAXDLAY 5       // maximum delay between wrong password attempts (seconds)
 
-#define CLINMAX 128 // maximum line length in configuration file
-
 #define fun_fail(msg)  { fprintf(stderr, "%s\n", msg); return 0; }
 
 #define TXTMSG 0  // text message type code
@@ -35,13 +33,12 @@ extern const char *CONFIG_FILE; // configuration file path
 
 
 /**
- * @brief Read a line of text from a file descriptor.
- * @param line Buffer to store the line.
- * @param n Size of the buffer.
+ * @brief Read a line from a file descriptor.
  * @param fd File descriptor.
- * @return 1 if successful, 0 otherwise.
+ * @return Line string if successful, NULL otherwise.
+ * @note Returned string must be freed by the caller.
 */
-int rdline(char *line, size_t n, int fd);
+char* rdline(int fd);
 
 
 /**

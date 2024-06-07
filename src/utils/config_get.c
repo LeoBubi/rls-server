@@ -17,11 +17,12 @@ config_get(char *key, char *value, size_t n)
 #endif
     }
     
-    char line[CLINMAX +1]; // +1 for null terminator
-    while (rdline(line, CLINMAX+1, config_fd))
+    char *line;
+    while ((line = rdline(config_fd)))
     {
         char *tok = strtok(line, "=");
         if (tok == NULL) {
+            free(line);
             close(config_fd);
             fun_fail("Invalid configuration file format.")
         }
@@ -30,21 +31,25 @@ config_get(char *key, char *value, size_t n)
         {
             tok = strtok(NULL, "\0");
             if (tok == NULL) {
+                free(line);
                 close(config_fd);
                 fun_fail("Invalid configuration file format: no value for specified key.")
             }
             
             if (strlen(tok) > n-1) {
+                free(line);
                 close(config_fd);
                 fun_fail("Invalid configuration file format: value too long.")
             }
             
             close(config_fd);
             strncpy(value, tok, n);
+            free(line);
             return 1;
         }
     }
 
     close(config_fd);
-    fun_fail("Key not found in configuration file.")
+    fprintf(stderr, "%s: key not found in configuration file.\n", key);
+    return 0;
 }
