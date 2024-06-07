@@ -284,6 +284,8 @@ rlss_handler(void)
                 exit(EXIT_FAILURE);
             }
 
+            char sigchr; // for signal characters
+
             switch (type)
             {
                 case CHRMSG:
@@ -298,7 +300,6 @@ rlss_handler(void)
                     break;
 
                 case SIGMSG:
-                    char sigchr;
                     switch (*(rlssig_t*)msg)
                     {
                         case SIGINT:
@@ -316,7 +317,7 @@ rlss_handler(void)
                         break;
                     }
 
-                    if (write(master, sigchr, 1) == -1) {
+                    if (write(master, &sigchr, 1) == -1) {
                         sndack(client_socket, 50);
                         close(client_socket);
                         killshell()
