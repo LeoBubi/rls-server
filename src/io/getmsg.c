@@ -4,6 +4,7 @@
 char* __gettxt(int sockfd);
 char* __getsig(int sockfd);
 char* __getctl(int sockfd);
+char* __getchr(int sockfd);
 
 
 char*
@@ -13,10 +14,16 @@ getmsg(int sockfd, char* type)
 
     char __type;
 
-    if (read(sockfd, &__type, sizeof(__type)) == -1) {
+    ssize_t rb = read(sockfd, &__type, sizeof(__type));
+    if (rb == -1) {
 #ifdef __DEBUG
         perror("getmsg: type: read");
 #endif
+        return NULL;
+    }
+
+    if (rb == 0) {
+        *type = CLOSED;
         return NULL;
     }
 
@@ -29,6 +36,8 @@ getmsg(int sockfd, char* type)
             return __getsig(sockfd);
         case CTLMSG:
             return __getctl(sockfd);
+        case CHRMSG:
+            return __getchr(sockfd);
         default:
             return NULL;
     }
@@ -121,4 +130,29 @@ __getctl(int sockfd)
     }
 
     return (char*)ctl;
+}
+
+
+char*
+__getchr(int sockfd)
+{
+    /* ----- get character ----- */
+
+    char *chr = (char*)malloc(1);
+    if (chr == NULL) {
+#ifdef __DEBUG
+        perror("__getchr: malloc");
+#endif
+        return NULL;
+    }
+
+    if (read(sockfd, chr, 1) == -1) {
+#ifdef __DEBUG
+        perror("__getchr: read");
+#endif
+        free(chr);
+        return NULL;
+    }
+
+    return chr;
 }

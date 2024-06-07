@@ -270,7 +270,14 @@ rls_handler(void)
         if (FD_ISSET(client_socket, &readfds))
         {
             char *msg = getmsg(client_socket, &type);
-            if (msg == NULL) {
+            if (msg == NULL) 
+            {
+                if (type == CLOSED) {
+                    close(client_socket);
+                    killshell()
+                    exit(EXIT_SUCCESS);
+                }
+                
                 sndack(client_socket, 50);
                 close(client_socket);
                 killshell()
@@ -279,25 +286,15 @@ rls_handler(void)
 
             switch (type)
             {
-                case TXTMSG:
-                    if (write(master, msg, strlen(msg)+1) == -1) {
-                        sndack(client_socket, 50);
+                case CHRMSG:
+                    if (write(master, msg, 1) == -1) {
                         free(msg);
+                        sndack(client_socket, 50);
                         close(client_socket);
                         killshell()
                         exit(EXIT_FAILURE);
                     }
                     sndack(client_socket, 20);
-                    
-                    // ignore input echo
-                    char ignored[BUFSIZ];
-                    if (read(master, ignored, BUFSIZ) == -1) {
-                        sndack(client_socket, 50);
-                        free(msg);
-                        close(client_socket);
-                        killshell()
-                        exit(EXIT_FAILURE);
-                    }
                     break;
 
                 case SIGMSG:
@@ -346,24 +343,22 @@ rls_handler(void)
 
         else if (FD_ISSET(master, &readfds))
         {
-            char buf[BUFSIZ];
-            memset(buf, '\0', BUFSIZ);
-            ssize_t rb = read(master, buf, BUFSIZ-1);
+            char c;
+
+            ssize_t rb = read(master, &c, 1);
             if (rb == -1) {
-                sndack(client_socket, 50);
                 close(client_socket);
                 killshell()
                 exit(EXIT_FAILURE);
             }
 
             if (rb == 0) {  // shell closed
-                sndack(client_socket, 50);
                 close(client_socket);
                 killshell()
                 exit(EXIT_SUCCESS);
             }
 
-            if (!sndmsg(client_socket, buf)) {
+            if (!sndchr(client_socket, c)) {
                 close(client_socket);
                 killshell()
                 exit(EXIT_FAILURE);

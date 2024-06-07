@@ -21,6 +21,8 @@ extern const char *CONFIG_FILE; // configuration file path
 #define TXTMSG 0  // text message type code
 #define SIGMSG 1  // signal message type code
 #define CTLMSG 2  // control message type code
+#define CHRMSG 3  // character message type code
+#define CLOSED 4  // closed message type code
 
 #define rlssig_t char  // signal type
 #define rlsctl_t char  // control type
@@ -83,6 +85,15 @@ int sndack(int sockfd, rlsack_t ack);
  * @return 1 if successful, 0 otherwise.
 */
 int sndmsg(int sockfd, const char *msg);
+
+
+/**
+ * @brief Send a character to a client.
+ * @param fd Client socket file descriptor.
+ * @param c Character to send.
+ * @return 1 if successful, 0 otherwise.
+*/
+int sndchr(int sockfd, char c);
 
 
 /**
