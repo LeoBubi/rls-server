@@ -298,18 +298,32 @@ rlss_handler(void)
                     break;
 
                 case SIGMSG:
-                    if (*(rlssig_t*)msg == SIGINT) {
-                        if (write(master, "\x03", 1) == -1) {
-                            sndack(client_socket, 50);
-                            close(client_socket);
-                            killshell()
-                            exit(EXIT_FAILURE);
-                        }
-                        sndack(client_socket, 20);
+                    char sigchr;
+                    switch (*(rlssig_t*)msg)
+                    {
+                        case SIGINT:
+                            sigchr = '\x03';    // CTRL+C
+                            break;
+                        case SIGQUIT:
+                            sigchr = '\x1C';    // CTRL+Backslash
+                            break;
+                        default:
+                            sigchr = 0;
                     }
-                    else 
-                        sndack(client_socket, 40);
 
+                    if (sigchr == 0) {
+                        sndack(client_socket, 40);
+                        break;
+                    }
+
+                    if (write(master, sigchr, 1) == -1) {
+                        sndack(client_socket, 50);
+                        close(client_socket);
+                        killshell()
+                        exit(EXIT_FAILURE);
+                    }
+
+                    sndack(client_socket, 20);
                     break;
                 
                 case CTLMSG:
