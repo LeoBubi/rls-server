@@ -79,15 +79,6 @@ int sndack(int sockfd, rlsack_t ack);
 
 
 /**
- * @brief Send a message to a client.
- * @param fd Client socket file descriptor.
- * @param msg Message to send.
- * @return 1 if successful, 0 otherwise.
-*/
-int sndmsg(int sockfd, const char *msg);
-
-
-/**
  * @brief Send a character to a client.
  * @param fd Client socket file descriptor.
  * @param c Character to send.
