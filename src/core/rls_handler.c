@@ -301,18 +301,22 @@ rls_handler(void)
                     break;
 
                 case SIGMSG:
-                    if (kill(shell_pid, *(sig_t*)msg) == -1) {
-                        sndack(client_socket, 50);
-                        free(msg);
-                        close(client_socket);
-                        killshell()
-                        exit(EXIT_FAILURE);
+                    if (*(rlssig_t*)msg == SIGINT) {
+                        if (write(master, "\x03", 1) == -1) {
+                            sndack(client_socket, 50);
+                            close(client_socket);
+                            killshell()
+                            exit(EXIT_FAILURE);
+                        }
+                        sndack(client_socket, 20);
                     }
-                    sndack(client_socket, 20);
+                    else 
+                        sndack(client_socket, 40);
+
                     break;
                 
                 case CTLMSG:
-                    switch (*(ctl_t*)msg)
+                    switch (*(rlsctl_t*)msg)
                     {
                         case CTLQUIT:
                             free(msg);

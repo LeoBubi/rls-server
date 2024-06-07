@@ -79,7 +79,7 @@ __getsig(int sockfd)
 {
     /* ----- get signal code ----- */
 
-    sig_t *sig = (sig_t*)malloc(sizeof(sig_t));
+    rlssig_t *sig = (rlssig_t*)malloc(sizeof(rlssig_t));
     if (sig == NULL) {
 #ifdef __DEBUG
         perror("__getsig: malloc");
@@ -87,7 +87,7 @@ __getsig(int sockfd)
         return NULL;
     }
 
-    if (read(sockfd, sig, sizeof(sig_t)) == -1) {
+    if (read(sockfd, sig, sizeof(rlssig_t)) == -1) {
 #ifdef __DEBUG
         perror("__getsig: read");
 #endif
@@ -104,7 +104,7 @@ __getctl(int sockfd)
 {
     /* ----- get command code ----- */
 
-    ctl_t *ctl = (ctl_t*)malloc(sizeof(ctl_t));
+    rlsctl_t *ctl = (rlsctl_t*)malloc(sizeof(rlsctl_t));
     if (ctl == NULL) {
 #ifdef __DEBUG
         perror("__getctl: malloc");
@@ -112,7 +112,7 @@ __getctl(int sockfd)
         return NULL;
     }
 
-    if (read(sockfd, ctl, sizeof(ctl_t)) == -1) {
+    if (read(sockfd, ctl, sizeof(rlsctl_t)) == -1) {
 #ifdef __DEBUG
         perror("__getctl: read");
 #endif

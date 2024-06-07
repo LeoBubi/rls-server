@@ -2,7 +2,7 @@
 
 
 int
-sndack(int sockfd, ack_t ack)
+sndack(int sockfd, rlsack_t ack)
 {
     /* ----- send ack ----- */
 

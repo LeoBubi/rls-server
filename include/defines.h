@@ -22,9 +22,9 @@ extern const char *CONFIG_FILE; // configuration file path
 #define SIGMSG 1  // signal message type code
 #define CTLMSG 2  // control message type code
 
-#define sig_t char  // signal type
-#define ctl_t char  // control type
-#define ack_t char  // ACK type
+#define rlssig_t char  // signal type
+#define rlsctl_t char  // control type
+#define rlsack_t char  // ACK type
 
 #define CTLQUIT 0  // quit command code
 
@@ -73,7 +73,7 @@ char* userinput(char* prompt);
  * @param code ACK code.
  * @return 1 if successful, 0 otherwise.
 */
-int sndack(int sockfd, ack_t ack);
+int sndack(int sockfd, rlsack_t ack);
 
 
 /**
