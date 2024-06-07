@@ -78,11 +78,11 @@ else
 fi
 
 # Initialize rls-server configuration file
-echo "PORT=513" > /etc/rls-server/rls-server.conf
+echo "SRVPORT=513" > /etc/rls-server/rls-server.conf
 echo "MAXCONN=16" >> /etc/rls-server/rls-server.conf
-echo "PASSATTEMPTS=3" >> /etc/rls-server/rls-server.conf
-echo "CONNTIMEO=10" >> /etc/rls-server/rls-server.conf
+echo "WPATTPT=3" >> /etc/rls-server/rls-server.conf
 echo "WPDELAY=2" >> /etc/rls-server/rls-server.conf
+echo "CONNTMO=10" >> /etc/rls-server/rls-server.conf
 
 if [ $? -eq 0 ]; then
     echo "Initialized rls-server configuration file"

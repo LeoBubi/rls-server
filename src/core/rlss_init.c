@@ -84,7 +84,7 @@ rlss_init(int argc, char const **argv)
     if (port == 0)
     {
         char port_str[6]; // 5 digits + null terminator
-        if (!config_get("PORT", port_str, 6))
+        if (!config_get("SRVPORT", port_str, 6))
             fun_fail("Failed to get port from configuration file.")
         
         if (!isint(port_str))
@@ -116,7 +116,7 @@ rlss_init(int argc, char const **argv)
 
     // get password maximum attempts from configuration file
     char pass_max_attempts_str[16];
-    if (!config_get("PASSATTEMPTS", pass_max_attempts_str, 16))
+    if (!config_get("WPATTPT", pass_max_attempts_str, 16))
         fun_fail("Failed to get maximum password attempts from configuration file.")
     
     if (!isint(pass_max_attempts_str))
@@ -129,7 +129,7 @@ rlss_init(int argc, char const **argv)
 
     // get client communication delay limit from configuration file
     char connto_str[16];
-    if (!config_get("CONNTIMEO", connto_str, 16))
+    if (!config_get("CONNTMO", connto_str, 16))
         fun_fail("Failed to get client communication delay limit from configuration file.")
     
     if (!isint(connto_str))
