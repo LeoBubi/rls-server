@@ -31,7 +31,7 @@ void handler_shutdown(int signo) {
 
 
 void
-rls_handler(void)
+rlss_handler(void)
 {
     char type;  // message type
 

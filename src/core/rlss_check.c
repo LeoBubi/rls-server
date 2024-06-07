@@ -1,7 +1,7 @@
 #include "includes.h"
 
 int
-rls_check(void)
+rlss_check(void)
 {
     /* ----- Check RESuid ----- */
 

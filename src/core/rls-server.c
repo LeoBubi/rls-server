@@ -36,12 +36,12 @@ main(int argc, char const *argv[])
 {
     /* ----- initial checks ----- */
 
-    if (!rls_check())
+    if (!rlss_check())
         exit(EXIT_FAILURE);
     
     /* ----- initialize rls server ----- */
 
-    if (!rls_init(argc, argv)) {
+    if (!rlss_init(argc, argv)) {
         fprintf(stderr, "Initialization failure.\n");
         exit(EXIT_FAILURE);
     }
@@ -186,7 +186,7 @@ main(int argc, char const *argv[])
 #endif
             if (handler_pid == 0) {
                 close(server_socket);
-                rls_handler(); // never returns
+                rlss_handler(); // never returns
             }
 
             if (handler_pid > 0)
