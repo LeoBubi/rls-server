@@ -318,6 +318,7 @@ rlss_handler(void)
                     }
 
                     if (write(master, &sigchr, 1) == -1) {
+                        free(msg);
                         sndack(client_socket, 50);
                         close(client_socket);
                         killshell()
