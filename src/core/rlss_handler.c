@@ -109,7 +109,10 @@ rlss_handler(void)
         exit(EXIT_FAILURE);
     } 
 
-    if (pw->pw_shell == NULL || pw->pw_shell[0] == '\0') {  // no shell assigned
+    if (pw->pw_shell == NULL || 
+            pw->pw_shell[0] == '\0' ||
+            strcmp(pw->pw_shell, "/usr/sbin/nologin") == 0 ||
+            strcmp(pw->pw_shell, "/bin/false") == 0) {  // no shell assigned
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
