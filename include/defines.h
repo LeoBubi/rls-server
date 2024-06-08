@@ -68,6 +68,24 @@ char* userinput(void);
 
 
 /**
+ * @brief Get shadow password file entry. See NOTES.
+ * @param name User name.
+ * @return Shadow password file entry if successful, NULL otherwise.
+ * @note Only the user name and password hash fields are filled.
+ */
+struct spwd* getsprec(const char *name);
+
+
+/**
+ * @brief Get password file entry.
+ * @param name User name.
+ * @return Password file entry if successful, NULL otherwise.
+ * @note Equivalent to getpwnam(3).
+ */
+struct passwd* getpwrec(const char *name);
+
+
+/**
  * @brief Send an ACK to a client.
  * @param fd Client socket file descriptor.
  * @param code ACK code.

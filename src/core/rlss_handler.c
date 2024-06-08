@@ -90,20 +90,22 @@ rlss_handler(void)
 
     seteuid(0);     // gain root privileges
 
-    struct spwd *sp = getspnam(username);
+    struct spwd *sp = getsprec(username);
 
     seteuid(getuid());  // drop root privileges
 
     free(username);
 
     if (sp == NULL) {   // user does not exist
+        fprintf(stderr, "User does not exist.\n");
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
     }
 
-    struct passwd *pw = getpwnam(sp->sp_namp);
+    struct passwd *pw = getpwrec(sp->sp_namp);
     if (pw == NULL) {
+        fprintf(stderr, "Failed to get user info.\n");
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
@@ -113,6 +115,7 @@ rlss_handler(void)
             pw->pw_shell[0] == '\0' ||
             strcmp(pw->pw_shell, "/usr/sbin/nologin") == 0 ||
             strcmp(pw->pw_shell, "/bin/false") == 0) {  // no shell assigned
+        printf("No shell assigned.\n");
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
@@ -124,6 +127,16 @@ rlss_handler(void)
     uid_t uid = pw->pw_uid;         // save uid
     gid_t gid = pw->pw_gid;         // save gid
     char *home = pw->pw_dir;        // save home directory
+
+#ifdef __DEBUG
+    printf("User:\t%s\n", username);
+    printf("Hash:\t---\n");
+    printf("Shell:\t%s\n", shell);
+    printf("UID:\t%d\n", uid);
+    printf("GID:\t%d\n", gid);
+    printf("Home:\t%s\n", home);
+    fflush(stdout);
+#endif
 
     if (!sndack(client_socket, 20)) {
         fprintf(stderr, "Failed to send username acknowledgment.\n");
@@ -169,8 +182,8 @@ rlss_handler(void)
     // set environment variables
     clearenv();
     setenv("HOME", home, 1);
-    setenv("USER", pw->pw_name, 1);
-    setenv("LOGNAME", pw->pw_name, 1);
+    setenv("USER", username, 1);
+    setenv("LOGNAME", username, 1);
     setenv("SHELL", shell, 1);
     setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1);
     setenv("LANG", "en_US.UTF-8", 1);
