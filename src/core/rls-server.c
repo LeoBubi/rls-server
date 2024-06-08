@@ -10,7 +10,12 @@ int wpdelay;            // delay between wrong password attempts
 int server_socket;    // server socket file descriptor
 int client_socket;    // client socket file descriptor
 
-#define destroy_zombies() while(waitpid(-1, NULL, WNOHANG) > 0)
+volatile sig_atomic_t connections = 0;  // number of active connections
+
+#define destroy_zombies() {                 \
+    while(waitpid(-1, NULL, WNOHANG) > 0)   \
+        connections--;                      \
+}
 
 #define kill_handlers() {                           \
     seteuid(0);         /* gain root privileges */  \
@@ -160,6 +165,14 @@ main(int argc, char const *argv[])
                 continue;
             }
 
+            // check if maximum number of connections reached
+
+            if (connections >= maxconn) {
+                sndack(client_socket, 50);
+                close(client_socket);
+                continue;
+            }
+
             // set reading and writing timeouts
 
             if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) == -1) {
@@ -191,8 +204,10 @@ main(int argc, char const *argv[])
                 rlss_handler(); // never returns
             }
 
-            if (handler_pid > 0)
+            if (handler_pid > 0) {
                 close(client_socket);
+                connections++;
+            }
         }
 
         /* ----- user input ----- */
