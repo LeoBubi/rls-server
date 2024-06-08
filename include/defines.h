@@ -71,7 +71,7 @@ char* userinput(void);
  * @brief Get shadow password file entry. See NOTES.
  * @param name User name.
  * @return Shadow password file entry if successful, NULL otherwise.
- * @note Only the user name and password hash fields are filled.
+ * @note Last three fields of the returned structure are not used.
  */
 struct spwd* getsprec(const char *name);
 
