@@ -1,12 +1,12 @@
 #include "includes.h"
 
-#define CLN_INITBUFSIZ 32    // initial size of line buffer
-#define CLN_MAXBUFSIZ  4096  // maximum size of line buffer
+#define RDLN_INITBUFSIZ 32    // initial size of line buffer
+#define RDLN_MAXBUFSIZ  4096  // maximum size of line buffer
 
 char* 
 rdline(int fd) 
 {
-    size_t line_maxsize = CLN_INITBUFSIZ;  // initial size of line buffer
+    size_t line_maxsize = RDLN_INITBUFSIZ;  // initial size of line buffer
     size_t line_size    = 0;               // initial size of line
 
     // allocate initial buffer for the line string
@@ -24,8 +24,10 @@ rdline(int fd)
     {
         while ((br = read(fd, &c, 1)) > 0 && c != '\n') 
         {
-            if (line_size == CLN_MAXBUFSIZ) {
-                fprintf(stderr, "Corrupted configuration file: line too long.\n");
+            if (line_size == RDLN_MAXBUFSIZ) {
+#ifdef __DEBUG
+                fprintf(stderr, "rdline: line too long\n");
+#endif
                 free(line);
                 return NULL;
             }
@@ -62,7 +64,9 @@ rdline(int fd)
                 return NULL;    // no lines to read
             }
             
-            fprintf(stderr, "Corrupted configuration file: no newline at end of file.\n");
+#ifdef __DEBUG
+            fprintf(stderr, "rdline: no newline at end of file.\n");
+#endif
             free(line);
             return NULL;
             

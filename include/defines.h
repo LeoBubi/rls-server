@@ -41,8 +41,8 @@ int isint(const char *s);
 
 
 /**
- * @brief Read a line from configuration file
- * @param fd Configuration file descriptor.
+ * @brief Read a line from file
+ * @param fd File descriptor.
  * @return Line string if successful, NULL otherwise.
  * @note Returned string must be freed by the caller.
 */
