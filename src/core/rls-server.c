@@ -214,7 +214,7 @@ main(int argc, char const *argv[])
 
         else if (FD_ISSET(STDIN_FILENO, &readfds))
         {
-            char *input = userinput(NULL);
+            char *input = userinput();
             if (input == NULL)
                 continue;
             

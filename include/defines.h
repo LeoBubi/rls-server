@@ -33,20 +33,20 @@ extern const char *CONFIG_FILE; // configuration file path
 
 
 /**
- * @brief Read a line from a file descriptor.
- * @param fd File descriptor.
- * @return Line string if successful, NULL otherwise.
- * @note Returned string must be freed by the caller.
-*/
-char* rdline(int fd);
-
-
-/**
  * @brief Check if a string is an integer.
  * @param s String to check.
  * @return 1 if integer, 0 otherwise.
 */
 int isint(const char *s);
+
+
+/**
+ * @brief Read a line from configuration file
+ * @param fd Configuration file descriptor.
+ * @return Line string if successful, NULL otherwise.
+ * @note Returned string must be freed by the caller.
+*/
+char* rdline(int fd);
 
 
 /**
@@ -61,11 +61,10 @@ int config_get(char *key, char *value, size_t n);
 
 /**
  * @brief Get user input.
- * @param prompt Prompt message or NULL.
  * @return User input string w/o newline character.
  * @note Returned string must be freed by the caller.
 */
-char* userinput(char* prompt);
+char* userinput(void);
 
 
 /**
@@ -97,14 +96,23 @@ char* getmsg(int sockfd, char* type);
 
 
 /**
- * @brief rls server initial checks.
+ * @brief Create a new pseudo-terminal file descriptor pair.
+ * @param amaster Master file descriptor.
+ * @param aslave Slave file descriptor.
+ * @return 1 if successful, 0 otherwise.
+*/
+int ptypair(int* amaster, int* aslave);
+
+
+/**
+ * @brief Things to check before anything else.
  * @return 1 if all checks are passed, 0 otherwise.
 */
 int rlss_check(void);
 
 
 /**
- * @brief rls server setup.
+ * @brief Import command line and configuration parameters.
  * @param argc Command line argument count.
  * @param argv Command line arguments.
  * @return 1 if successful, 0 otherwise.
@@ -116,15 +124,6 @@ int rlss_init(int argc, char const **argv);
  * @brief rls handler process.
 */
 void rlss_handler(void);
-
-
-/**
- * @brief Create a new pseudo-terminal file descriptor pair.
- * @param amaster Master file descriptor.
- * @param aslave Slave file descriptor.
- * @return 1 if successful, 0 otherwise.
-*/
-int ptypair(int* amaster, int* aslave);
 
 
 #endif /* _DEFINES_H */

@@ -5,14 +5,8 @@
 
 
 char* 
-userinput(char* prompt) 
+userinput(void) 
 {
-    /* ----- print prompt ----- */
-
-    if (prompt != NULL) {
-        printf("%s", prompt);
-    }
-
     /* ----- read user input ----- */
 
     size_t input_maxsize = UIN_INITBUFSIZ;  // initial size of input buffer
