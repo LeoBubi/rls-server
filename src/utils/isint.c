@@ -14,6 +14,10 @@ isint(const char *s)
     
     if (i > 10)     // 10 digits is the maximum for a 32-bit integer
         return 0;
+    
+    long int n = atol(s);
+    if (n < INT_MIN || n > INT_MAX)
+        return 0;
 
     return 1;
 }
