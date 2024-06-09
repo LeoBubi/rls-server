@@ -14,6 +14,12 @@ if [ ! -d "/usr/local/bin" ]; then
     exit 1
 fi
 
+# Check if /usr/local/share/man/ exists
+if [ ! -d "/usr/local/share/man" ]; then
+    echo "Error: /usr/local/share/man directory does not exist"
+    exit 1
+fi
+
 
 # Check if rls-server is installed already
 if [ -f "/usr/local/bin/rls-server" ]; then
@@ -29,7 +35,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Copy rls-server to /usr/local/bin
+# Install rls-server in /usr/local/bin
 mv rls-server /usr/local/bin
 if [ $? -eq 0 ]; then
     echo "Installed rls-server to /usr/local/bin"
@@ -90,6 +96,43 @@ else
     echo "Failed to initialize rls-server configuration file"
     exit 1
 fi
+
+# Move rls-server(1) to /usr/local/share/man/man1
+if [ ! -d "/usr/local/share/man/man1" ]; then
+    mkdir /usr/local/share/man/man1
+    if [ $? -eq 0 ]; then
+        echo "Created /usr/local/share/man/man1 directory"
+    else
+        echo "Failed to create /usr/local/share/man/man1 directory"
+        exit 1
+    fi
+fi
+mv man/rls-server.1 /usr/local/share/man/man1
+if [ $? -eq 0 ]; then
+    echo "Moved rls-server(1) to /usr/local/share/man/man1"
+else
+    echo "Failed to move rls-server(1) to /usr/local/share/man/man1"
+    exit 1
+fi
+
+# Move rls-server(7) to /usr/local/share/man/man7
+if [ ! -d "/usr/local/share/man/man7" ]; then
+    mkdir /usr/local/share/man/man7
+    if [ $? -eq 0 ]; then
+        echo "Created /usr/local/share/man/man7 directory"
+    else
+        echo "Failed to create /usr/local/share/man/man7 directory"
+        exit 1
+    fi
+fi
+mv man/rls-server.7 /usr/local/share/man/man7
+if [ $? -eq 0 ]; then
+    echo "Moved rls-server(7) to /usr/local/share/man/man7"
+else
+    echo "Failed to move rls-server(7) to /usr/local/share/man/man7"
+    exit 1
+fi
+
 
 echo "rls-server has been installed successfully"
 echo ""
