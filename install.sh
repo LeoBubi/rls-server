@@ -107,7 +107,7 @@ if [ ! -d "/usr/local/share/man/man1" ]; then
         exit 1
     fi
 fi
-mv man/rls-server.1 /usr/local/share/man/man1
+cp man/rls-server.1 /usr/local/share/man/man1
 if [ $? -eq 0 ]; then
     echo "Moved rls-server(1) to /usr/local/share/man/man1"
 else
@@ -125,7 +125,7 @@ if [ ! -d "/usr/local/share/man/man7" ]; then
         exit 1
     fi
 fi
-mv man/rls-server.7 /usr/local/share/man/man7
+cp man/rls-server.7 /usr/local/share/man/man7
 if [ $? -eq 0 ]; then
     echo "Moved rls-server(7) to /usr/local/share/man/man7"
 else
