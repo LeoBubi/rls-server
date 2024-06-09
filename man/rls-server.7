@@ -1,0 +1,325 @@
+.Dd $Mdocdate: June 9 2024 $
+.Dt RLS-SERVER 7
+.Os
+
+.Sh NAME
+.Nm rls-server
+.Nd Remote Login Shell Server
+
+.Sh SYNOPSIS
+.Nm
+.Op Fl p Ar port
+.Op Fl m Ar maxconn
+
+.Sh DESCRIPTION
+This manual page describes the specific operation and file
+hierarchy of
+.Nm ,
+providing also an overview of the communication protocol with
+.Nm rls
+clients.
+.Pp
+This manual page is structured as follows:
+.Pp
+.Bl -bullet -offset indent -compact
+
+.It
+.Em Program structure :
+File hierarchy and source code organization.
+
+.It
+.Em Configuration :
+Configuration file structure and fields.
+
+.It
+.Em Client management :
+Client authentication and shell session handling.
+
+.It
+.Em Communication :
+Client-Server communication protocol.
+
+.El
+
+
+.Sh PROGRAM STRUCTURE
+The program file hierarchy is structured as follows:
+.Pp
+
+.nf
+rls-server  
+   ├──── core  
+   │      ├── rlss_check.c  
+   │      ├── rls-server.c  
+   │      ├── rlss_handler.c  
+   │      └── rlss_init.c  
+   ├──── io  
+   │      ├── getmsg.c  
+   │      ├── sndack.c  
+   │      ├── sndchr.c  
+   │      └── userinput.c  
+   └──── utils  
+          ├── config_get.c  
+          ├── getpwrec.c  
+          ├── getsprec.c  
+          ├── isint.c  
+          ├── ptypair.c  
+          └── rdline.c  
+.fi
+
+.Ss core directory
+This directory contains, namely, the core of the program. The
+.Em main
+function is located inside
+.Em rls-server.c .
+Both 
+.Em rlss_check()
+and
+.Em rlss_init()
+are called during the startup phase of the program. 
+The former performs a series of initial checks 
+(e.g. check program privileges), whereas the latter
+initializes the server by reading eventual command line
+arguments and the configuration file.
+.Pp
+Once the server initialization is complete, a server socket
+is opened and marked as passive to listen for client connections.
+When a new client connects, the server creates a new subprocess
+by calling
+.Xr fork(2) ,
+which immediately executes
+.Em rlss_handler() ,
+the function entirely responsible for managing the client until
+they terminate the connection.
+
+.Ss io directory
+This directory contains functions that support client-server and
+user-server communication.
+.Pp
+.Em getmsg()
+is used to receive and correctly interpret a messagge from a client.
+.Em sndack()
+and
+.Em sndchr()
+are instead used to send an acknowledgment or a character to the client.
+.Pp 
+Details about the communication protocol are provided below.
+.Pp
+.Em userinput()
+is used to enable the user (server-side) to interact with server.
+
+.Ss utils directory
+This directory contains a set of utility functions that support the
+program execution.
+.Pp
+.Bl -tag -width Ds
+
+.It config_get()
+reads the value of a variable stored in the configuration file.
+
+.It getpwrec()
+reads the password file entry of a user. This function is almost equivalent to
+.Xr getpwnam(3) .
+
+.It getsprec()
+reads the shadow password file entry of a user (last three fields are ignored).
+This function is almost equivalent to
+.Xr getspnam(3) .
+
+.It isint()
+tells if a string represents an integer value.
+
+.It ptypair()
+returns the master and slave file descriptors for an available pseudoterminal.
+This function is similar to
+.Xr openpty(3) ,
+or the combined use of
+.Xr posix_openpt(3) ,
+.Xr grantpt(3) ,
+.Xr unlockpt(3)
+and
+.Xr ptsname(3) .
+
+.It rdline()
+reads the next '\\n'-terminated line from a file descriptor.
+
+.El
+
+.Sh CONFIGURATION
+Each line in the configuration file represents a configuration
+variable in the form <key>=<value>.
+.Pp
+Below the defined variables:
+
+.Bl -tag -width Ds
+.It Em CONNTMO
+When communicating with a client, if a receive or send operation stalls for more then
+.Em CONNTMO
+seconds, the server closes the connection. Minimum value: 1. Maximum value: 3600.
+Default value: 10.
+
+.It Em MAXCONN
+The highest number of simultaneously supported connections. This may be overridden
+by the associated command line option at invocation time. Minimum value: 1. Maximum
+value: 512. Default value: 16.
+
+.It Em SRVPORT
+The port to listen clients from. This may be overridden by the associated command
+line option at invocation time. All valid ports number are legal. Default value: 513.
+
+.It Em WPATTPT
+Maximum number of password attempts for a client that is trying to authenticate.
+After this limit, the server closes the connection. Minimum value: 1. Default value: 3.
+
+.It Em WPDELAY
+Time in seconds the server waits before acknowledging a client after a wrong
+password attempt during authentication. Minimum value: 1. Maximum value: 5.
+Default value: 2.
+
+.El
+
+
+.Sh CLIENT MANAGEMENT
+For each client, the server creates a new subprocess that runs
+.Em rlss_handler() ,
+the function responsible for ensuring proper authentication and managing
+the client session.
+
+.Ss Client authentication
+The server initially receives the username of the user the client 
+wants to log in to. So, the server calls
+.Em getsprec()
+and
+.Em getpwrec()
+to obtain the requested user's info, speficically: password hash, uid, 
+gid, shell and home directory.
+.Pp
+The server then receives the password for the requested user. To check its
+validity, the function
+.Em crypt(3)
+(see NOTES) is called to obtain a hash value. This will be compared to the user's 
+password hash. In case of match, the user is successfully authenticated.
+In case of mismatch, if the client tried to authenticate too many times
+then the server closes the connection, otherwise it acknowledges the 
+wrong attempt and waits for a new password from the client.
+
+.Ss Shell session creation
+Once the client has authenticated, the server process handling this client
+performs the following sequence of actions:
+
+.Bl -bullet -offset indent -compact
+
+.It
+Change the process environment to the one of the requested user.
+
+.It
+Change current working directory to the requested user home directory.
+
+.It
+Change user and group identities to the ones of the requested user.
+
+.It
+Generate the master/slave file descriptors for a new pseudoterminal.
+
+.El
+
+At this point, the process creates a subprocess via
+.Xr fork(2) ,
+which will be used to start a terminal session as the requested user.
+In the subprocess, standard input, output and error are all replaced 
+with the slave file descriptor.
+.Pp
+The process handling the client will then iteratively do the following
+things:
+
+.Bl -bullet -offset indent -compact
+.It
+If it receives a character from the client, it forwards it to the
+shell by writing to the master file descriptor.
+
+.It
+If it receives a SIGINT or SIGQUIT signal number from the client,
+it sends the associated special ASCII code to the shell by writing
+to the master file descriptor.
+
+.It
+If it receives a quit command from the client, it kills the shell
+and then terminates.
+
+.It
+If it receives a character from the shell (reading the master file descriptor), 
+it forwards it to the client.
+
+.El
+
+.Sh COMMUNICATION
+
+.Ss Message acknowledgement
+Regardless of the type, for each message the client sends to the server,
+it always expects an immediate acknowledgement response containing
+an acknowledgement code that belongs to one of the following ranges:
+
+.Bl -bullet -offset indent -compact
+.It
+.Em 20-29 :
+Successful responses
+
+.It 
+.Em 40-49 :
+Client error responses
+
+.It
+.Em 50-59 :
+Server error responses
+
+.El
+
+.Ss Message types
+The server can receive from the client messages up to four different types.
+In order for the server to be able to understand the type, each
+message from the client consists of at least two packets: the first one
+contains the message type, while the others contain its payload.
+.Pp
+Below the four message types:
+
+.Bl -bullet -offset indent -compact
+.It
+.Em Text :
+Message containing a variable-length string. Structured in three packets:
+message type, payload size, payload.
+
+.It
+.Em Character :
+Message containing a single ASCII character. Structured in two packets:
+message type, character.
+
+.It
+.Em Signal :
+Message containing a signal number. Structured in two packets: message type, 
+signal number.
+
+.It 
+.Em Control :
+Message containing a control code to be interpreted accordingly by the server.
+Structured in two packets: message type, control code.
+
+.El
+
+Text type messages are used by the client only to send initial username and 
+password. Once the shell session is established, client input to the shell is
+sent character by character. This is crucial because all echoing takes place
+at the server-side shell, so that (except for delays) the client-side 
+.Xr rls(1)
+program is as transparent as possible.
+
+
+
+
+
+.Sh NOTES
+The library function
+.Em crypt(3)
+is not part of the Computer Systems and Programming 2023/24 course program.
+However, this is stricly needed to be able to verify a password correctness.
+As a result, its use is rather obligatory.
+
