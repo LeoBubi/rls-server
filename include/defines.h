@@ -10,7 +10,7 @@ extern const char *CONFIG_FILE; // configuration file path
 #define PORTMIN 1       // minimum server port number
 #define PORTMAX 65535   // maximum server port number
 #define MINCONN 1       // minimum maximum number of connections
-#define MAXCONN 64      // maximum maximum number of connections
+#define MAXCONN 512     // maximum maximum number of connections
 #define MINCNTO 1       // minimum communication delay limit (seconds)
 #define MAXCNTO 3600    // maximum communication delay limit (seconds)
 #define MINDLAY 1       // minimum delay between wrong password attempts (seconds)
