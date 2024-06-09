@@ -18,4 +18,12 @@ rlss_check(void)
         fun_fail("Program not configured properly. Please uninstall and reinstall.");
     
     return 1;
+
+    /* ----- check configuration file ----- */
+
+    if (access(CONFIG_FILE, F_OK) == -1)
+        fun_fail("Configuration file not found.");
+
+    if (access(CONFIG_FILE, R_OK) == -1)
+        fun_fail("Configuration file not readable.");
 }

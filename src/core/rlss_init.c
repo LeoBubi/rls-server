@@ -17,14 +17,6 @@ rlss_init(int argc, char const **argv)
     /* ----- set effective uid to user for security ----- */
 
     seteuid(getuid());  // ruid = euid = caller uid -- suid = root uid
-
-    /* ----- check configuration file ----- */
-
-    if (access(CONFIG_FILE, F_OK) == -1)
-        fun_fail("Configuration file not found.");
-
-    if (access(CONFIG_FILE, R_OK) == -1)
-        fun_fail("Configuration file not readable.");
     
     /* ----- read command line arguments ----- */
 
