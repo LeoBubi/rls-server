@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
+#include <limits.h>
 #include <linux/limits.h>
 #include <netinet/in.h>
 #include <pwd.h>
