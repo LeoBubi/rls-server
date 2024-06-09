@@ -34,6 +34,15 @@ else
     exit 1
 fi
 
+# Remove rls-server man pages
+rm -f /usr/local/share/man/man1/rls-server.1 /usr/local/share/man/man7/rls-server.7
+if [ $? -eq 0 ]; then
+    echo "Removed rls-server man pages under /usr/local/man"
+else
+    echo "Cannot remove rls-server man pages under /usr/local/man"
+    exit 1
+fi
+
 echo "rls-server has been uninstalled successfully"
 exit 0
 
