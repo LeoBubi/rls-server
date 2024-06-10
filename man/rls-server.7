@@ -103,7 +103,7 @@ and
 .Em sndchr()
 are instead used to send an acknowledgment or a character to the client.
 .Pp 
-Details about the communication protocol are provided below.
+For details about the communication protocol see COMMUNICATION.
 .Pp
 .Em userinput()
 is used to enable the user (server-side) to interact with server.
@@ -149,7 +149,7 @@ reads the next '\\n'-terminated line from a file descriptor.
 Each line in the configuration file represents a configuration
 variable in the form <key>=<value>.
 .Pp
-Below the defined variables:
+The defined variables are:
 
 .Bl -tag -width Ds
 .It Em CONNTMO
@@ -310,7 +310,7 @@ password. Once the shell session is established, client input to the shell is
 sent character by character. This is crucial because all echoing takes place
 at the server-side shell, so that (except for delays) the client-side 
 .Xr rls(1)
-program is as transparent as possible.
+program is almost transparent.
 .Pp
 Server-to-client messages can be of just two types: acknowledgement and character.
 Their meaning is assumed to be understood by now.
