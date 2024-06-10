@@ -41,6 +41,10 @@ userinput(void)
         input[input_size++] = c;
     }
 
+    if (c == EOF && input_size == 0) {
+        input[input_size++] = '\x04'; // EOF character
+    }
+
     input[input_size] = '\0'; // null-terminate the input string
 
     return input;

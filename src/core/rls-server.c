@@ -218,7 +218,7 @@ main(int argc, char const *argv[])
             if (input == NULL)
                 continue;
             
-            if (strcmp(input, "quit") == 0) {
+            if (strcmp(input, "quit") == 0 || input[0] == '\x04') {
                 free(input);
                 kill(getpid(), SIGQUIT);
             }
