@@ -8,10 +8,10 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 
-local bindir="/usr/local/bin"
-local mandir="/usr/local/share/man"
-local srcdir="/usr/local/src"
-local etcdir="/usr/local/etc"
+bindir="/usr/local/bin"
+mandir="/usr/local/share/man"
+srcdir="/usr/local/src"
+etcdir="/usr/local/etc"
 
 
 # Check if rls-server is installed already
@@ -21,11 +21,11 @@ if [ -f "$bindir/rls-server" ]; then
 fi
 
 
-local bin=1
-local man=1
-local src=1
-local etc=1
-local missing=0
+bin=1
+man=1
+src=1
+etc=1
+missing=0
 
 
 # Check if bin directory exists
