@@ -1,7 +1,7 @@
 #include "includes.h"
 
 
-const char *CONFIG_FILE = "/etc/rls-server/rls-server.conf";    // configuration file path
+const char *CONFIG_FILE = "/usr/local/etc/rls-server/rls-server.conf";    // configuration file path
 
 
 extern int port;                // server port number
