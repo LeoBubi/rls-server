@@ -15,7 +15,10 @@
 .Nm
 is a server that allows (remote)
 .Nm rls
-clients to connect to and obtain a shell on this host.
+clients to connect to and obtain a shell on this host. Client-server communication is 
+.Em unencrypted . 
+Therefore, it is strongly recommended to make sure that such a communication is 
+between two trusted hosts over a secure network.
 .Pp
 To shutdown the server you can type quit. Alternatively, you can use Ctrl+C or Ctrl+\\.
 .Pp

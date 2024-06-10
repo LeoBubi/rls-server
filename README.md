@@ -2,6 +2,8 @@
 
 **rls-server** is a server that allows (remote) rls clients to connect to and obtain a shell on this host.
 
+Client-server communication is **unencrypted**. Therefore, it is strongly recommended to make sure that such a communication is between two trusted hosts over a secure network.
+
 ### Installation
 
 To install **rls-server**, please run the installation script **install.sh** with root privileges.
