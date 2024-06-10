@@ -20,6 +20,12 @@ if [ -f "$bindir/rls-server" ]; then
     exit 0
 fi
 
+# Check if make is installed
+if [ ! -x "$(which make)" ]; then
+    echo "make is not installed"
+    exit 1
+fi
+
 
 bin=1
 man=1
