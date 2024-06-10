@@ -66,10 +66,10 @@ if [ $missing -eq 1 ]; then
     if [ $etc -eq 0 ]; then
         echo "    $etcdir"
     fi
-    echo "Continue? (y/n)"
+    echo "Continue? (Y/n)"
     
-    read -q ans
-    if [ "$ans" != "y" ]; then
+    read -n 1 ans
+    if [ "$ans" != "y" -a "$ans" != "Y" ]; then
         echo "Installation aborted"
         exit 0
     fi
@@ -126,7 +126,7 @@ echo "... done"
 echo ""
 
 # Install rls-server in bin directory
-mv rls-server $bindir
+mv rls-server $bindir/rls-server
 if [ $? -eq 0 ]; then
     echo "Installed rls-server to $bindir"
 else
@@ -224,7 +224,15 @@ else
 fi
 
 # Copy source code to src directory
-cp -r include src $srcdir/rls-server
+mkdir $srcdir/rls-server
+if [ $? -eq 0 ]; then
+    echo "Created $srcdir/rls-server"
+else
+    echo "Failed to create $srcdir/rls-server"
+    exit 1
+fi
+cp -r include $srcdir/rls-server/include
+cp -r src $srcdir/rls-server/src
 if [ $? -eq 0 ]; then
     echo "Copied source code to $srcdir/rls-server"
 else
