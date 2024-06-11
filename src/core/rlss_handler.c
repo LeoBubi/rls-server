@@ -253,17 +253,6 @@ rlss_handler(void)
         /* ----- create a new session ----- */
 
         setsid();
-        if (ioctl(slave, TIOCSCTTY, NULL) == -1) {
-#ifdef __DEBUG
-            perror("TIOCSCTTY ioctl");
-#else
-            fprintf(stderr, "An internal error occurred.\n");
-#endif
-            close(master);
-            close(slave);
-            exit(EXIT_FAILURE);
-
-        }
 
         /* ----- setup file descriptors ----- */
 
