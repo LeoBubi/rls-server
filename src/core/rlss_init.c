@@ -12,9 +12,9 @@ extern int wpdelay;             // delay between wrong password attempts
 
 
 // check if port is an integer and within valid range
-int __check_port(char *port_str);
+int __check_port(const char *port_str);
 // check if maximum number of connections is an integer and within valid range
-int __check_maxconn(char *maxconn_str);
+int __check_maxconn(const char *maxconn_str);
 
 
 
@@ -139,7 +139,7 @@ rlss_init(int argc, char const **argv)
 
 
 int 
-__check_port(char *port_str)
+__check_port(const char *port_str)
 {
     if (!isint(port_str))
         fun_fail("Port must be an integer.")
@@ -157,7 +157,7 @@ __check_port(char *port_str)
 
 
 int
-__check_maxconn(char *maxconn_str)
+__check_maxconn(const char *maxconn_str)
 {
     if (!isint(maxconn_str))
         fun_fail("Maximum number of connections must be an integer.")
