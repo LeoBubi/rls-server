@@ -15,7 +15,7 @@ rlss_check(void)
 
     // program must have SETUID bit set
     if (euid != 0 || suid != 0)
-        fun_fail("Program not configured properly. Please uninstall and reinstall.");
+        fun_fail("Program not configured properly. Please reinstall it.");
     
     return 1;
 
