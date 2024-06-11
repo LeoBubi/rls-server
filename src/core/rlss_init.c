@@ -11,6 +11,13 @@ extern int connto;              // client communication delay limit
 extern int wpdelay;             // delay between wrong password attempts
 
 
+// check if port is an integer and within valid range
+int __check_port(char *port_str);
+// check if maximum number of connections is an integer and within valid range
+int __check_maxconn(char *maxconn_str);
+
+
+
 int
 rlss_init(int argc, char const **argv)
 {
@@ -30,16 +37,9 @@ rlss_init(int argc, char const **argv)
         {
             if (i+1 >= argc)
                 fun_fail("No port number specified.");
-            if (!isint(argv[i+1]))
-                fun_fail("Port number must be an integer.");
-            if (atoi(argv[i+1]) < PORTMIN) {
-                fprintf(stderr, "Minimum port number is %d.\n", PORTMIN);
+            
+            if (!__check_port(argv[i+1]))
                 return 0;
-            }
-            if (atoi(argv[i+1]) > PORTMAX) {
-                fprintf(stderr, "Maximum port number is %d.\n", PORTMAX);
-                return 0;
-            }
 
             port = atoi(argv[++i]);
         }
@@ -49,16 +49,9 @@ rlss_init(int argc, char const **argv)
         {
             if (i+1 >= argc)
                 fun_fail("No maximum number of connections specified.");
-            if (!isint(argv[i+1]))
-                fun_fail("Maximum number of connections must be an integer.");
-            if (atoi(argv[i+1]) < MINCONN) {
-                fprintf(stderr, "Minimum maximum number of connections is %d.\n", MINCONN);
+            
+            if (!__check_maxconn(argv[i+1]))
                 return 0;
-            }
-            if (atoi(argv[i+1]) > MAXCONN) {
-                fprintf(stderr, "Maximum maximum number of connections is %d.\n", MAXCONN);
-                return 0;
-            }
 
             maxconn = atoi(argv[++i]);
         }
@@ -79,12 +72,8 @@ rlss_init(int argc, char const **argv)
         if (!config_get("SRVPORT", port_str, 6))
             fun_fail("Failed to get port from configuration file.")
         
-        if (!isint(port_str))
-            fun_fail("Port number in configuration file must be an integer.")
-        if (atoi(port_str) < PORTMIN)
-            fun_fail("Port number in configuration file too low.")
-        if (atoi(port_str) > PORTMAX)
-            fun_fail("Port number in configuration file too high.")
+        if (!__check_port(port_str))
+            return 0;
         
         port = atoi(port_str);
     }
@@ -96,12 +85,8 @@ rlss_init(int argc, char const **argv)
         if (!config_get("MAXCONN", maxconn_str, 4))
             fun_fail("Failed to get maximum number of connections from configuration file.")
         
-        if (!isint(maxconn_str))
-            fun_fail("Maximum number of connections in configuration file must be an integer.")
-        if (atoi(maxconn_str) < MINCONN)
-            fun_fail("Maximum number of connections in configuration file too low.")
-        if (atoi(maxconn_str) > MAXCONN)
-            fun_fail("Maximum number of connections in configuration file too high.")
+        if (!__check_maxconn(maxconn_str))
+            return 0;
         
         maxconn = atoi(maxconn_str);
     }
@@ -151,3 +136,40 @@ rlss_init(int argc, char const **argv)
 
     return 1;
 }
+
+
+int 
+__check_port(char *port_str)
+{
+    if (!isint(port_str))
+        fun_fail("Port must be an integer.")
+    if (atoi(port_str) < PORTMIN) {
+        fprintf(stderr, "Minimum port number is %d.\n", PORTMIN);
+        return 0;
+    }
+    if (atoi(port_str) > PORTMAX) {
+        fprintf(stderr, "Maximum port number is %d.\n", PORTMAX);
+        return 0;
+    }
+    
+    return 1;
+}
+
+
+int
+__check_maxconn(char *maxconn_str)
+{
+    if (!isint(maxconn_str))
+        fun_fail("Maximum number of connections must be an integer.")
+    if (atoi(maxconn_str) < MINCONN) {
+        fprintf(stderr, "Minimum maximum number of connections is %d.\n", MINCONN);
+        return 0;
+    }
+    if (atoi(maxconn_str) > MAXCONN) {
+        fprintf(stderr, "Maximum maximum number of connections is %d.\n", MAXCONN);
+        return 0;
+    }
+    
+    return 1;
+}
+
