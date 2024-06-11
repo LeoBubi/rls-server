@@ -421,7 +421,7 @@ rlss_handler(void)
             char c;
 
             ssize_t rb = read(master, &c, 1);
-            if (rb == -1) {
+            if (rb == -1 && errno != EIO) {
 #ifdef __DEBUG
                 perror("read from shell");
 #else
@@ -432,7 +432,7 @@ rlss_handler(void)
                 exit(EXIT_FAILURE);
             }
 
-            if (rb == 0) {  // shell closed
+            if (rb < 0) {  // shell closed
                 close(client_socket);
                 killshell()
                 exit(EXIT_SUCCESS);
