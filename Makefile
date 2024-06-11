@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -std=c17 -I include -D __DEBUG
+CFLAGS = -Wall -Wextra -Werror -pedantic -std=c17 -I include
 LDFLAGS = -lcrypt
 
 SRCDIR = src
