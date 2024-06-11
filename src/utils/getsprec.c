@@ -30,8 +30,6 @@ getsprec(const char* name)
     char *line;
     while ((line = rdline(spfd)))
     {
-        //printf("getsprec: line: %s\n", line);
-
         char *tok = strtok(line, ":");
 
         if (strcmp(tok, name) == 0)

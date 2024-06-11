@@ -36,8 +36,6 @@ getpwrec(const char* name)
     char *line;
     while ((line = rdline(pwfd)))
     {
-        //printf("getpwrec: line: %s\n", line);
-
         char *tok = strtok(line, ":");
 
         if (strcmp(tok, name) == 0)
