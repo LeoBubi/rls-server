@@ -90,6 +90,19 @@ main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // set socket options
+
+    int opt = 1;
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+#ifdef __DEBUG
+        perror("rls-server: setsockopt for reusing address");
+#else
+        fprintf(stderr, "Unable to start listening for client connections.\n");
+#endif
+        close(server_socket);
+        exit(EXIT_FAILURE);
+    }
+
     // bind socket
 
     if (port < 1024) seteuid(0);    // gain root privileges
