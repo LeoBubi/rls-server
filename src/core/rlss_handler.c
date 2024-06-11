@@ -57,7 +57,7 @@ rlss_handler(void)
     sigaction(SIGUSR1, &sa, NULL);
 
     if (!sndack(client_socket, 20)) {
-        fprintf(stderr, "Failed to send connection acknowledgment.\n");
+        fprintf(stderr, "Communication error.\n");
         close(client_socket);
         exit(EXIT_FAILURE);
     }
@@ -66,6 +66,11 @@ rlss_handler(void)
 
     char *username = getmsg(client_socket, &type);
     if (username == NULL) {
+#ifdef __DEBUG
+        fprintf(stderr, "Unable to receive username.\n");
+#else
+        fprintf(stderr, "Communication error.\n");
+#endif
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
@@ -97,7 +102,6 @@ rlss_handler(void)
     free(username);
 
     if (sp == NULL) {   // user does not exist
-        fprintf(stderr, "User does not exist.\n");
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
@@ -105,7 +109,7 @@ rlss_handler(void)
 
     struct passwd *pw = getpwrec(sp->sp_namp);
     if (pw == NULL) {
-        fprintf(stderr, "Failed to get user info.\n");
+        fprintf(stderr, "An internal error occurred.\n");
         sndack(client_socket, 50);
         close(client_socket);
         exit(EXIT_FAILURE);
@@ -115,7 +119,6 @@ rlss_handler(void)
             pw->pw_shell[0] == '\0' ||
             strcmp(pw->pw_shell, "/usr/sbin/nologin") == 0 ||
             strcmp(pw->pw_shell, "/bin/false") == 0) {  // no shell assigned
-        printf("No shell assigned.\n");
         sndack(client_socket, 40);
         close(client_socket);
         exit(EXIT_SUCCESS);
@@ -139,7 +142,7 @@ rlss_handler(void)
 #endif
 
     if (!sndack(client_socket, 20)) {
-        fprintf(stderr, "Failed to send username acknowledgment.\n");
+        fprintf(stderr, "Communication error.\n");
         close(client_socket);
         exit(EXIT_FAILURE);
     }
@@ -151,6 +154,11 @@ rlss_handler(void)
     {
         char *password = getmsg(client_socket, &type);
         if (password == NULL) {
+#ifdef __DEBUG
+            fprintf(stderr, "Unable to receive password.\n");
+#else
+            fprintf(stderr, "Communication error.\n");
+#endif
             sndack(client_socket, 50);
             close(client_socket);
             exit(EXIT_FAILURE);
@@ -210,6 +218,8 @@ rlss_handler(void)
     if (!ptypair(&master, &slave)) {
 #ifdef __DEBUG
         fprintf(stderr, "Failed to open pseudoterminal pair.\n");
+#else
+        fprintf(stderr, "An internal error occurred.\n");
 #endif
         sndack(client_socket, 50);
         close(client_socket);
@@ -220,6 +230,11 @@ rlss_handler(void)
 
     shell_pid = fork();
     if (shell_pid == -1) {
+#ifdef __DEBUG
+        perror("fork");
+#else
+        fprintf(stderr, "An internal error occurred.\n");
+#endif
         close(master);
         close(slave);
         sndack(client_socket, 50);
@@ -239,7 +254,13 @@ rlss_handler(void)
 
         setsid();
         if (ioctl(slave, TIOCSCTTY, NULL) == -1) {
+#ifdef __DEBUG
             perror("TIOCSCTTY ioctl");
+#else
+            fprintf(stderr, "An internal error occurred.\n");
+#endif
+            close(master);
+            close(slave);
             exit(EXIT_FAILURE);
 
         }
@@ -279,6 +300,13 @@ rlss_handler(void)
 
         fd_set readfds = __readfds;
         if (select((client_socket > master ? client_socket : master) + 1, &readfds, NULL, NULL, NULL) == -1) {
+            if (errno == EINTR)
+                continue;
+#ifdef __DEBUG
+            perror("select");
+#else
+            fprintf(stderr, "An internal error occurred.\n");
+#endif
             sndack(client_socket, 50);
             killshell()
             exit(EXIT_FAILURE);
@@ -297,6 +325,11 @@ rlss_handler(void)
                     exit(EXIT_SUCCESS);
                 }
                 
+#ifdef __DEBUG
+                fprintf(stderr, "Unable to receive client message.\n");
+#else
+                fprintf(stderr, "Communication error.\n");
+#endif
                 sndack(client_socket, 50);
                 close(client_socket);
                 killshell()
@@ -309,6 +342,11 @@ rlss_handler(void)
             {
                 case CHRMSG:
                     if (write(master, msg, 1) == -1) {
+#ifdef __DEBUG
+                        perror("write to shell");
+#else
+                        fprintf(stderr, "An internal error occurred.\n");
+#endif
                         free(msg);
                         sndack(client_socket, 50);
                         close(client_socket);
@@ -337,6 +375,11 @@ rlss_handler(void)
                     }
 
                     if (write(master, &sigchr, 1) == -1) {
+#ifdef __DEBUG
+                        perror("write to shell");
+#else
+                        fprintf(stderr, "An internal error occurred.\n");
+#endif
                         free(msg);
                         sndack(client_socket, 50);
                         close(client_socket);
@@ -353,10 +396,7 @@ rlss_handler(void)
                         case CTLQUIT:
                             free(msg);
                             sndack(client_socket, 20);
-                            write(master, "exit\n", sizeof("exit\n"));
-                            if (waitpid(shell_pid, NULL, 0) == -1) {
-                                killshell();
-                            }
+                            killshell()
                             close(client_socket);
                             close(master);
                             exit(EXIT_SUCCESS);
@@ -382,6 +422,11 @@ rlss_handler(void)
 
             ssize_t rb = read(master, &c, 1);
             if (rb == -1) {
+#ifdef __DEBUG
+                perror("read from shell");
+#else
+                fprintf(stderr, "An internal error occurred.\n");
+#endif
                 close(client_socket);
                 killshell()
                 exit(EXIT_FAILURE);
@@ -394,6 +439,11 @@ rlss_handler(void)
             }
 
             if (!sndchr(client_socket, c)) {
+#ifdef __DEBUG
+                fprintf(stderr, "Unable to send shell output.\n");
+#else
+                fprintf(stderr, "Communication error.\n");
+#endif
                 close(client_socket);
                 killshell()
                 exit(EXIT_FAILURE);
