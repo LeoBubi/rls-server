@@ -33,13 +33,15 @@ config_get(char *key, char *value, size_t n)
             if (tok == NULL) {
                 free(line);
                 close(config_fd);
-                fun_fail("Invalid configuration file format: no value for specified key.")
+                fprintf(stderr, "%s: no value found in configuration file.\n", key);
+                return 0;
             }
             
             if (strlen(tok) > n-1) {
                 free(line);
                 close(config_fd);
-                fun_fail("Invalid configuration file format: value too long.")
+                fprintf(stderr, "%s: value too long.\n", key);
+                return 0;
             }
             
             close(config_fd);
@@ -50,6 +52,6 @@ config_get(char *key, char *value, size_t n)
     }
 
     close(config_fd);
-    fprintf(stderr, "%s: key not found in configuration file.\n", key);
+    fprintf(stderr, "%s: not found in configuration file.\n", key);
     return 0;
 }
